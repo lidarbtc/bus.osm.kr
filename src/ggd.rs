@@ -16,16 +16,39 @@ struct GGDBusStop {
     longitude: f64,
 }
 
+#[derive(Deserialize)]
+struct BboxQuery {
+    bbox: String,
+}
+
 #[get("/api/ggd/bus_stops")]
-pub async fn get_ggd_bus_stops(db: web::Data<Pool>) -> impl Responder {
+pub async fn get_ggd_bus_stops(
+    db: web::Data<Pool>,
+    query: web::Query<BboxQuery>,
+) -> impl Responder {
     let client = db.get().await.unwrap();
+    let bbox: Vec<&str> = query.bbox.split(',').collect();
+
+    if bbox.len() != 4 {
+        return HttpResponse::BadRequest().body("Invalid bbox parameter");
+    }
+
+    let min_lng: f64 = bbox[0].parse().unwrap();
+    let min_lat: f64 = bbox[1].parse().unwrap();
+    let max_lng: f64 = bbox[2].parse().unwrap();
+    let max_lat: f64 = bbox[3].parse().unwrap();
 
     let stmt = client
-        .prepare("SELECT 시군명, 정류소명, 정류소영문명, 정류소id, 정류소번호, 중앙차로여부, 관할관청, 위치, WGS84위도, WGS84경도 FROM ggd_bus_stops")
+        .prepare(
+            "SELECT 시군명, 정류소명, 정류소영문명, 정류소id, 정류소번호, 중앙차로여부, 관할관청, 위치, WGS84위도, WGS84경도 FROM ggd_bus_stops
+            WHERE WGS84경도 BETWEEN $1 AND $2 AND WGS84위도 BETWEEN $3 AND $4",
+        )
         .await
         .unwrap();
 
-    let bus_stops_result = client.query(&stmt, &[]).await;
+    let bus_stops_result = client
+        .query(&stmt, &[&min_lng, &max_lng, &min_lat, &max_lat])
+        .await;
 
     match bus_stops_result {
         Ok(rows) => {
