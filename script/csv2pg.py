@@ -22,9 +22,9 @@ def main():
     # PostgreSQL 데이터베이스에 연결
     conn = psycopg2.connect(
         host="localhost",    # PostgreSQL 서버 주소
-        database="your_database_name",  # 데이터베이스 이름
-        user="your_username",  # 데이터베이스 사용자
-        password="your_password"  # 사용자 비밀번호
+        database="bus",  # 데이터베이스 이름
+        user="bus",  # 데이터베이스 사용자
+        password="1234"  # 사용자 비밀번호
     )
     
     try:
