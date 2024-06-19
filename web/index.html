@@ -29,14 +29,21 @@
 
         // OpenStreetMap 타일 레이어 추가
         L.tileLayer('https://tiles.osm.kr/hot/{z}/{x}/{y}.png', {
-            maxZoom: 19,
+            zoom: 16,
+            minZoom: 16,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        var marker = L.marker([37.5665, 126.9780]).addTo(map);
-
-        // 마커에 팝업 추가
-        marker.bindPopup("<b>서울</b><br>대한민국의 수도입니다.").openPopup();
+        // 버스 정류장 데이터 가져오기
+        fetch('https://bus.lidar.blog/api/seoul/bus_stops')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(stop => {
+                    var marker = L.marker([stop.y, stop.x]).addTo(map);
+                    marker.bindPopup(`<b>${stop.name}</b><br>ARS ID: ${stop.ars_id}<br>정류소타입: ${stop.stop_type}`);
+                });
+            })
+            .catch(error => console.error('Error fetching bus stops:', error));
     </script>
 </body>
 
