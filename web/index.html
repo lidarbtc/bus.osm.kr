@@ -34,17 +34,28 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // 버스 정류장 데이터 가져오기
-        fetch('https://bus.lidar.blog/api/seoul/bus_stops')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(stop => {
-                    var marker = L.marker([stop.y, stop.x]).addTo(map);
-                    marker.bindPopup(`<b>${stop.name}</b><br>ARS ID: ${stop.ars_id}<br>정류소타입: ${stop.stop_type}`);
-                });
-            })
-            .catch(error => console.error('Error fetching bus stops:', error));
+        function fetchBusStops(bbox) {
+            fetch(`https://bus.lidar.blog/api/seoul/bus_stops?bbox=${bbox}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(stop => {
+                        var marker = L.marker([stop.y, stop.x]).addTo(map);
+                        marker.bindPopup(`<b>${stop.name}</b><br>ARS ID: ${stop.ars_id}<br>정류소타입: ${stop.stop_type}`);
+                    });
+                })
+                .catch(error => console.error('Error fetching bus stops:', error));
+        }
+
+        function updateBusStops() {
+            var bounds = map.getBounds();
+            var bbox = `${bounds.getSouthWest().lng},${bounds.getSouthWest().lat},${bounds.getNorthEast().lng},${bounds.getNorthEast().lat}`;
+            fetchBusStops(bbox);
+        }
+
+        map.on('moveend', updateBusStops);
+        updateBusStops(); // 초기 로드 시에도 호출
     </script>
+
 </body>
 
 </html>
