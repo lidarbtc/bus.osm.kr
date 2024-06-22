@@ -4,12 +4,13 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct BusStop {
-    node_id: i32,
-    ars_id: String,
+    stop_id: i32,
     name: String,
-    x: f64,
-    y: f64,
     stop_type: String,
+    stop_number: String,
+    latitude: f64,
+    longitude: f64,
+    info_display: String,
 }
 
 #[derive(Deserialize)]
@@ -36,8 +37,8 @@ pub async fn get_seoul_bus_stops(
 
     let stmt = client
         .prepare(
-            "SELECT NODE_ID, ARS_ID, 정류소명, X좌표, Y좌표, 정류소타입 FROM seoul_bus_stops 
-                  WHERE X좌표 BETWEEN $1 AND $2 AND Y좌표 BETWEEN $3 AND $4",
+            "SELECT 정류장_ID, 정류장_명칭, 정류장_유형, 정류장_번호, 위도, 경도, 버스도착정보안내기_설치_여부 FROM seoul_bus_stops 
+                  WHERE 경도 BETWEEN $1 AND $2 AND 위도 BETWEEN $3 AND $4",
         )
         .await
         .unwrap();
@@ -52,12 +53,13 @@ pub async fn get_seoul_bus_stops(
 
             for row in rows {
                 let bus_stop = BusStop {
-                    node_id: row.get("NODE_ID"),
-                    ars_id: row.get("ARS_ID"),
-                    name: row.get("정류소명"),
-                    x: row.get("X좌표"),
-                    y: row.get("Y좌표"),
-                    stop_type: row.get("정류소타입"),
+                    stop_id: row.get("정류장_ID"),
+                    name: row.get("정류장_명칭"),
+                    stop_type: row.get("정류장_유형"),
+                    stop_number: row.get("정류장_번호"),
+                    latitude: row.get("위도"),
+                    longitude: row.get("경도"),
+                    info_display: row.get("버스도착정보안내기_설치_여부"),
                 };
 
                 bus_stops.push(bus_stop);

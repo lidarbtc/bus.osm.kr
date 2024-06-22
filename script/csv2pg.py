@@ -1,9 +1,9 @@
 import psycopg2
 import pandas as pd
 
-def load_csv_to_postgresql(csv_file, table_name, conn):
+def load_csv_to_postgresql(csv_file, table_name, conn, delimiter=',', line_terminator='\n'):
     # CSV 파일을 DataFrame으로 읽기
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, delimiter=delimiter, lineterminator=line_terminator)
     
     # 테이블의 기존 데이터를 삭제
     with conn.cursor() as cursor:
@@ -29,7 +29,7 @@ def main():
     
     try:
         # 경기도 버스 정류장 정보 삽입
-        load_csv_to_postgresql('ggd.csv', 'ggd_bus_stops', conn)
+        load_csv_to_postgresql('ggd.csv', 'ggd_bus_stops', conn, delimiter='|', line_terminator='^')
         
         # 서울 버스 정류장 정보 삽입
         load_csv_to_postgresql('seoul.csv', 'seoul_bus_stops', conn)

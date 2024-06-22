@@ -1,21 +1,21 @@
-CREATE TABLE ggd_bus_stops (
-    시군명 TEXT,
-    정류소명 TEXT,
-    정류소영문명 TEXT,
-    정류소id INTEGER,
-    정류소번호 FLOAT,
-    중앙차로여부 TEXT,
-    관할관청 TEXT,
-    위치 TEXT,
-    WGS84위도 FLOAT,
-    WGS84경도 FLOAT
+CREATE TABLE seoul_bus_stops (
+    정류장_ID INTEGER PRIMARY KEY,
+    정류장_명칭 TEXT,
+    정류장_유형 TEXT,
+    정류장_번호 TEXT,
+    위도 FLOAT,
+    경도 FLOAT,
+    버스도착정보안내기_설치_여부 TEXT
 );
 
-CREATE TABLE seoul_bus_stops (
-    NODE_ID INTEGER,
-    ARS_ID TEXT,
-    정류소명 TEXT,
-    X좌표 FLOAT,
-    Y좌표 FLOAT,
-    정류소타입 TEXT
+CREATE TABLE ggd_bus_stops (
+    STATION_ID INTEGER PRIMARY KEY,
+    STATION_NM TEXT,
+    CENTER_ID TEXT,
+    CENTER_YN TEXT,
+    X FLOAT,
+    Y FLOAT,
+    REGION_NAME TEXT,
+    MOBILE_NO TEXT,
+    DISTRICT_CD TEXT
 );

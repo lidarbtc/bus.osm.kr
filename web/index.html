@@ -99,11 +99,11 @@
             source: seoulVectorSource,
             style: new ol.style.Style({
                 image: new ol.style.Circle({
-                    radius: 7,
+                    radius: 5,
                     fill: new ol.style.Fill({ color: '#ff0000' }), // 빨간색 마커
                     stroke: new ol.style.Stroke({
                         color: '#ffffff', // 흰색 테두리
-                        width: 2
+                        width: 1
                     })
                 })
             })
@@ -113,11 +113,11 @@
             source: ggdVectorSource,
             style: new ol.style.Style({
                 image: new ol.style.Circle({
-                    radius: 7,
+                    radius: 5,
                     fill: new ol.style.Fill({ color: '#0000ff' }), // 파란색 마커
                     stroke: new ol.style.Stroke({
                         color: '#ffffff', // 흰색 테두리
-                        width: 2
+                        width: 1
                     })
                 })
             })
@@ -134,10 +134,10 @@
                 seoulVectorSource.clear(); // 기존 마커 제거
                 data.forEach(stop => {
                     const feature = new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.x, stop.y])),
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.longitude, stop.latitude])),
                         name: stop.name,
-                        ars_id: stop.ars_id,
-                        stop_type: stop.stop_type
+                        stop_id: stop.stop_id,
+                        stop_number: stop.stop_number
                     });
                     seoulVectorSource.addFeature(feature);
                 });
@@ -154,10 +154,10 @@
                 ggdVectorSource.clear(); // 기존 마커 제거
                 data.forEach(stop => {
                     const feature = new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.longitude, stop.latitude])),
-                        name: stop.stop_name,
-                        stop_id: stop.stop_id,
-                        stop_number: stop.stop_number
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.x, stop.y])),
+                        name: stop.station_name,
+                        station_id: stop.station_id,
+                        stop_number: stop.mobile_no
                     });
                     ggdVectorSource.addFeature(feature);
                 });
@@ -203,9 +203,9 @@
             if (features.length > 0) {
                 const feature = features[0];
                 const name = feature.get('name');
-                const ars_id = feature.get('ars_id') || feature.get('stop_id');
-                const stop_type = feature.get('stop_type') || feature.get('stop_number');
-                content.innerHTML = `<b>${name}</b><br>ARS ID: ${ars_id}<br>정류소타입: ${stop_type}`;
+                const id = feature.get('station_id') || feature.get('stop_id');
+                const number = feature.get('stop_number');
+                content.innerHTML = `<b>${name}</b><br>ID: ${id}<br>번호: ${number}`;
                 overlay.setPosition(coordinate);
             } else {
                 overlay.setPosition(undefined);

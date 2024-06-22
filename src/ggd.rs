@@ -4,16 +4,15 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct GGDBusStop {
-    city_name: String,
-    stop_name: String,
-    stop_english_name: String,
-    stop_id: i32,
-    stop_number: f64,
-    central_lane: String,
-    jurisdiction: String,
-    location: String,
-    latitude: f64,
-    longitude: f64,
+    station_id: i32,
+    station_name: String,
+    center_id: String,
+    center_yn: String,
+    x: f64,
+    y: f64,
+    region_name: String,
+    mobile_no: String,
+    district_cd: String,
 }
 
 #[derive(Deserialize)]
@@ -40,8 +39,9 @@ pub async fn get_ggd_bus_stops(
 
     let stmt = client
         .prepare(
-            "SELECT 시군명, 정류소명, 정류소영문명, 정류소id, 정류소번호, 중앙차로여부, 관할관청, 위치, WGS84위도, WGS84경도 FROM ggd_bus_stops
-            WHERE WGS84경도 BETWEEN $1 AND $2 AND WGS84위도 BETWEEN $3 AND $4",
+            "SELECT STATION_ID, STATION_NM, CENTER_ID, CENTER_YN, X, Y, REGION_NAME, MOBILE_NO, DISTRICT_CD 
+             FROM ggd_bus_stops
+             WHERE X BETWEEN $1 AND $2 AND Y BETWEEN $3 AND $4",
         )
         .await
         .unwrap();
@@ -56,16 +56,15 @@ pub async fn get_ggd_bus_stops(
 
             for row in rows {
                 let bus_stop = GGDBusStop {
-                    city_name: row.get("시군명"),
-                    stop_name: row.get("정류소명"),
-                    stop_english_name: row.get("정류소영문명"),
-                    stop_id: row.get("정류소id"),
-                    stop_number: row.get("정류소번호"),
-                    central_lane: row.get("중앙차로여부"),
-                    jurisdiction: row.get("관할관청"),
-                    location: row.get("위치"),
-                    latitude: row.get("WGS84위도"),
-                    longitude: row.get("WGS84경도"),
+                    station_id: row.get("STATION_ID"),
+                    station_name: row.get("STATION_NM"),
+                    center_id: row.get("CENTER_ID"),
+                    center_yn: row.get("CENTER_YN"),
+                    x: row.get("X"),
+                    y: row.get("Y"),
+                    region_name: row.get("REGION_NAME"),
+                    mobile_no: row.get("MOBILE_NO"),
+                    district_cd: row.get("DISTRICT_CD"),
                 };
 
                 bus_stops.push(bus_stop);
