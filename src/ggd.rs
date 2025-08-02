@@ -11,7 +11,7 @@ struct GGDBusStop {
     x: f64,
     y: f64,
     region_name: String,
-    mobile_no: String,
+    mobile_no: Option<String>,
     district_cd: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
 }
 
