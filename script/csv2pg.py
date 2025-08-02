@@ -5,20 +5,24 @@ import psycopg2
 def load_csv_to_postgresql(
     csv_file, table_name, conn, delimiter=",", line_terminator="\n"
 ):
-    # CSV 파일을 DataFrame으로 읽기
     if table_name == "seoul_bus_stops":
-        seoul_dtypes = {"ARS_ID": str}
-        df = pd.read_csv(csv_file, delimiter=delimiter, dtype=seoul_dtypes)
+        df = pd.read_csv(
+            csv_file,
+            delimiter=delimiter,
+            dtype={"ARS_ID": str},
+            keep_default_na=False,
+            na_values=[""],
+        )
     else:
-        ggd_dtypes = {"mobileNo": str}
         df = pd.read_csv(
             csv_file,
             delimiter=delimiter,
             lineterminator=line_terminator,
-            dtype=ggd_dtypes,
+            dtype={"mobileNo": str},
+            keep_default_na=False,
+            na_values=[""],
         )
 
-    # ggd_bus_stops 테이블에 대한 특별 처리
     if table_name == "ggd_bus_stops":
         column_mapping = {
             "stationId": "station_id",
@@ -43,7 +47,6 @@ def load_csv_to_postgresql(
         ]
         df = df[db_columns_order]
 
-    # seoul_bus_stops 테이블에 대한 특별 처리
     elif table_name == "seoul_bus_stops":
         column_mapping = {
             "NODE_ID": "정류장_ID",
@@ -66,27 +69,20 @@ def load_csv_to_postgresql(
         ]
         df = df[db_columns_order]
 
-    # 테이블의 기존 데이터를 삭제
     with conn.cursor() as cursor:
         cursor.execute(f"DELETE FROM {table_name}")
         conn.commit()
 
-        # DataFrame을 PostgreSQL 테이블로 복사
         for i, row in df.iterrows():
             placeholders = ", ".join(["%s"] * len(row))
             columns = ", ".join([col.lower() for col in row.index])
             sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-
-            # .where(pd.notna(row), None)은 NaN, NaT 등을 None으로 바꿔줌
-            # 문자열로 읽었기 때문에 빈 문자열이 있을 수 있으므로, 이를 None으로 처리하는 로직 추가
-            data_tuple = tuple(row.replace("", None).where(pd.notna(row), None))
-
+            data_tuple = tuple(row.where(pd.notna(row), None))
             cursor.execute(sql, data_tuple)
         conn.commit()
 
 
 def main():
-    # PostgreSQL 데이터베이스에 연결
     conn = psycopg2.connect(
         host="localhost",
         database="bus",
@@ -95,15 +91,11 @@ def main():
     )
 
     try:
-        # 경기도 버스 정류장 정보 삽입
         load_csv_to_postgresql(
             "ggd.csv", "ggd_bus_stops", conn, delimiter="|", line_terminator="^"
         )
-
-        # 서울 버스 정류장 정보 삽입
         load_csv_to_postgresql("seoul.csv", "seoul_bus_stops", conn)
     finally:
-        # 연결 종료
         conn.close()
 
 
