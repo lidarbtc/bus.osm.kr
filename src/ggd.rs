@@ -4,17 +4,34 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 struct GGDBusStop {
+    // #[serde(rename = "...")] 속성을 사용하여 JSON 필드 이름을 변경
+    #[serde(rename = "stop_id")]
     station_id: i32,
-    station_nm: String,        // 필드명도 DB 컬럼명과 일치시키는 것이 좋음
-    center_id: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
-    center_yn: String,
-    x: f64,
-    y: f64,
-    region_name: String,
-    mobile_no: Option<String>,
-    district_cd: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
-}
 
+    #[serde(rename = "name")] // station_nm -> name
+    station_nm: String,
+
+    #[serde(rename = "center_id")]
+    center_id: Option<String>,
+
+    #[serde(rename = "center_yn")]
+    center_yn: String,
+
+    #[serde(rename = "longitude")] // x -> longitude
+    x: f64,
+
+    #[serde(rename = "latitude")] // y -> latitude
+    y: f64,
+
+    #[serde(rename = "region_name")]
+    region_name: String,
+
+    #[serde(rename = "stop_number")] // mobile_no -> stop_number
+    mobile_no: Option<String>,
+
+    #[serde(rename = "district_cd")]
+    district_cd: Option<String>,
+}
 #[derive(Deserialize)]
 struct BboxQuery {
     bbox: String,

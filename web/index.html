@@ -1,218 +1,241 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+    <head>
+        <title>경기/서울 버스 정류장 리스트맵</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css"
+            type="text/css"
+        />
+        <style>
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+            }
 
-<head>
-    <title>경기/서울 버스 정류장 리스트맵</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css" type="text/css">
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
+            #map {
+                height: 100%;
+                width: 100%;
+            }
 
-        #map {
-            height: 100%;
-            width: 100%;
-        }
+            .ol-popup {
+                position: absolute;
+                background-color: white;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid #cccccc;
+                bottom: 12px;
+                left: -50px;
+                min-width: 200px;
+            }
 
-        .ol-popup {
-            position: absolute;
-            background-color: white;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #cccccc;
-            bottom: 12px;
-            left: -50px;
-            min-width: 200px;
-        }
+            .ol-popup:after,
+            .ol-popup:before {
+                top: 100%;
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+            }
 
-        .ol-popup:after,
-        .ol-popup:before {
-            top: 100%;
-            border: solid transparent;
-            content: " ";
-            height: 0;
-            width: 0;
-            position: absolute;
-            pointer-events: none;
-        }
+            .ol-popup:after {
+                border-color: rgba(255, 255, 255, 0);
+                border-top-color: white;
+                border-width: 10px;
+                left: 48px;
+                margin-left: -10px;
+            }
 
-        .ol-popup:after {
-            border-color: rgba(255, 255, 255, 0);
-            border-top-color: white;
-            border-width: 10px;
-            left: 48px;
-            margin-left: -10px;
-        }
+            .ol-popup:before {
+                border-color: rgba(204, 204, 204, 0);
+                border-top-color: #cccccc;
+                border-width: 11px;
+                left: 48px;
+                margin-left: -11px;
+            }
 
-        .ol-popup:before {
-            border-color: rgba(204, 204, 204, 0);
-            border-top-color: #cccccc;
-            border-width: 11px;
-            left: 48px;
-            margin-left: -11px;
-        }
+            .ol-popup-closer {
+                text-decoration: none;
+                position: absolute;
+                top: 2px;
+                right: 8px;
+            }
 
-        .ol-popup-closer {
-            text-decoration: none;
-            position: absolute;
-            top: 2px;
-            right: 8px;
-        }
+            .ol-popup-closer:after {
+                content: "✖";
+            }
+        </style>
+    </head>
 
-        .ol-popup-closer:after {
-            content: "✖";
-        }
-    </style>
-</head>
+    <body>
+        <div id="map" class="map"></div>
+        <div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+        <script>
+            // 지도 초기화
+            const map = new ol.Map({
+                target: "map",
+                layers: [
+                    new ol.layer.Tile({
+                        source: new ol.source.OSM(),
+                    }),
+                ],
+                view: new ol.View({
+                    center: ol.proj.fromLonLat([126.978, 37.5665]),
+                    zoom: 13,
+                }),
+            });
 
-<body>
-    <div id="map" class="map"></div>
-    <div id="popup" class="ol-popup">
-        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-        <div id="popup-content"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
-    <script>
-        // 지도 초기화
-        const map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                })
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([126.9780, 37.5665]),
-                zoom: 13
-            })
-        });
+            const seoulVectorSource = new ol.source.Vector();
+            const ggdVectorSource = new ol.source.Vector();
 
-        const seoulVectorSource = new ol.source.Vector();
-        const ggdVectorSource = new ol.source.Vector();
+            const seoulVectorLayer = new ol.layer.Vector({
+                source: seoulVectorSource,
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        fill: new ol.style.Fill({ color: "#ff0000" }), // 빨간색 마커
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff", // 흰색 테두리
+                            width: 1,
+                        }),
+                    }),
+                }),
+            });
 
-        const seoulVectorLayer = new ol.layer.Vector({
-            source: seoulVectorSource,
-            style: new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 5,
-                    fill: new ol.style.Fill({ color: '#ff0000' }), // 빨간색 마커
-                    stroke: new ol.style.Stroke({
-                        color: '#ffffff', // 흰색 테두리
-                        width: 1
-                    })
-                })
-            })
-        });
+            const ggdVectorLayer = new ol.layer.Vector({
+                source: ggdVectorSource,
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        fill: new ol.style.Fill({ color: "#0000ff" }), // 파란색 마커
+                        stroke: new ol.style.Stroke({
+                            color: "#ffffff", // 흰색 테두리
+                            width: 1,
+                        }),
+                    }),
+                }),
+            });
 
-        const ggdVectorLayer = new ol.layer.Vector({
-            source: ggdVectorSource,
-            style: new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 5,
-                    fill: new ol.style.Fill({ color: '#0000ff' }), // 파란색 마커
-                    stroke: new ol.style.Stroke({
-                        color: '#ffffff', // 흰색 테두리
-                        width: 1
-                    })
-                })
-            })
-        });
+            map.addLayer(seoulVectorLayer);
+            map.addLayer(ggdVectorLayer);
 
-        map.addLayer(seoulVectorLayer);
-        map.addLayer(ggdVectorLayer);
-
-        // 서울 버스 정류장 데이터를 가져와서 지도에 마커 추가
-        const fetchSeoulBusStops = async (bbox) => {
-            try {
-                const response = await fetch(`https://bus.lidar.blog/api/seoul/bus_stops?bbox=${bbox}`);
-                const data = await response.json();
-                seoulVectorSource.clear(); // 기존 마커 제거
-                data.forEach(stop => {
+            // 공통 로직을 처리할 함수
+            const addBusStopFeatures = (source, stops) => {
+                source.clear(); // 기존 마커 제거
+                stops.forEach((stop) => {
+                    // longitude 또는 latitude가 null/undefined인 경우 건너뛰기
+                    if (stop.longitude == null || stop.latitude == null) {
+                        console.warn(
+                            "Skipping stop with invalid coordinates:",
+                            stop,
+                        );
+                        return;
+                    }
                     const feature = new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.longitude, stop.latitude])),
+                        geometry: new ol.geom.Point(
+                            ol.proj.fromLonLat([stop.longitude, stop.latitude]),
+                        ),
                         name: stop.name,
                         stop_id: stop.stop_id,
-                        stop_number: stop.stop_number
+                        stop_number: stop.stop_number,
                     });
-                    seoulVectorSource.addFeature(feature);
+                    source.addFeature(feature);
                 });
-            } catch (error) {
-                console.error('Error fetching Seoul bus stops:', error);
-            }
-        };
+            };
 
-        // 경기도 버스 정류장 데이터를 가져와서 지도에 마커 추가
-        const fetchGGDBusStops = async (bbox) => {
-            try {
-                const response = await fetch(`https://bus.lidar.blog/api/ggd/bus_stops?bbox=${bbox}`);
-                const data = await response.json();
-                ggdVectorSource.clear(); // 기존 마커 제거
-                data.forEach(stop => {
-                    const feature = new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([stop.x, stop.y])),
-                        name: stop.station_name,
-                        station_id: stop.station_id,
-                        stop_number: stop.mobile_no
-                    });
-                    ggdVectorSource.addFeature(feature);
-                });
-            } catch (error) {
-                console.error('Error fetching GGD bus stops:', error);
-            }
-        };
+            // 서울 버스 정류장 데이터를 가져와서 지도에 마커 추가
+            const fetchSeoulBusStops = async (bbox) => {
+                try {
+                    const response = await fetch(
+                        `https://bus.lidar.blog/api/seoul/bus_stops?bbox=${bbox}`,
+                    );
+                    const data = await response.json();
+                    addBusStopFeatures(seoulVectorSource, data);
+                } catch (error) {
+                    console.error("Error fetching Seoul bus stops:", error);
+                }
+            };
 
-        const updateBusStops = () => {
-            const extent = map.getView().calculateExtent(map.getSize());
-            const bbox = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326').join(',');
-            fetchSeoulBusStops(bbox);
-            fetchGGDBusStops(bbox);
-        };
+            // 경기도 버스 정류장 데이터를 가져와서 지도에 마커 추가
+            const fetchGGDBusStops = async (bbox) => {
+                try {
+                    const response = await fetch(
+                        `https://bus.lidar.blog/api/ggd/bus_stops?bbox=${bbox}`,
+                    );
+                    const data = await response.json();
+                    // ★★★★★ 수정된 부분 ★★★★★
+                    // 서울과 동일한 로직을 사용하도록 변경
+                    addBusStopFeatures(ggdVectorSource, data);
+                } catch (error) {
+                    console.error("Error fetching GGD bus stops:", error);
+                }
+            };
 
-        map.on('moveend', updateBusStops);
-        map.once('rendercomplete', updateBusStops); // 초기 로드 시에도 호출
+            const updateBusStops = () => {
+                const extent = map.getView().calculateExtent(map.getSize());
+                const bbox = ol.proj
+                    .transformExtent(extent, "EPSG:3857", "EPSG:4326")
+                    .join(",");
+                fetchSeoulBusStops(bbox);
+                fetchGGDBusStops(bbox);
+            };
 
-        // 팝업 기능 추가
-        const container = document.getElementById('popup');
-        const content = document.getElementById('popup-content');
-        const closer = document.getElementById('popup-closer');
+            map.on("moveend", updateBusStops);
+            map.once("rendercomplete", updateBusStops); // 초기 로드 시에도 호출
 
-        const overlay = new ol.Overlay({
-            element: container,
-            autoPan: true,
-            autoPanAnimation: {
-                duration: 250
-            }
-        });
-        map.addOverlay(overlay);
+            // 팝업 기능 추가
+            const container = document.getElementById("popup");
+            const content = document.getElementById("popup-content");
+            const closer = document.getElementById("popup-closer");
 
-        closer.onclick = function () {
-            overlay.setPosition(undefined);
-            closer.blur();
-            return false;
-        };
+            const overlay = new ol.Overlay({
+                element: container,
+                autoPan: true,
+                autoPanAnimation: {
+                    duration: 250,
+                },
+            });
+            map.addOverlay(overlay);
 
-        map.on('singleclick', function (evt) {
-            const coordinate = evt.coordinate;
-            const features = map.getFeaturesAtPixel(evt.pixel);
-
-            if (features.length > 0) {
-                const feature = features[0];
-                const name = feature.get('name');
-                const id = feature.get('station_id') || feature.get('stop_id');
-                const number = feature.get('stop_number');
-                content.innerHTML = `<b>${name}</b><br>ID: ${id}<br>번호: ${number}`;
-                overlay.setPosition(coordinate);
-            } else {
+            closer.onclick = function () {
                 overlay.setPosition(undefined);
                 closer.blur();
-            }
-        });
-    </script>
-</body>
+                return false;
+            };
 
+            map.on("singleclick", function (evt) {
+                const coordinate = evt.coordinate;
+                // getFeaturesAtPixel은 모든 레이어의 피처를 반환하므로 별도 처리가 필요 없음
+                const feature = map.forEachFeatureAtPixel(
+                    evt.pixel,
+                    function (feature) {
+                        return feature;
+                    },
+                );
+
+                if (feature) {
+                    const name = feature.get("name");
+                    // ★★★★★ 수정된 부분 ★★★★★
+                    // 팝업에서도 통일된 필드 이름을 사용
+                    const id = feature.get("stop_id");
+                    const number = feature.get("stop_number");
+                    content.innerHTML = `<b>${name}</b><br>ID: ${id}<br>번호: ${number || "정보 없음"}`;
+                    overlay.setPosition(coordinate);
+                } else {
+                    overlay.setPosition(undefined);
+                    closer.blur();
+                }
+            });
+        </script>
+    </body>
 </html>
