@@ -1,0 +1,78 @@
+[Unit]
+Description=Bus API OSM Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/bus-api-osm/bus-api-osm
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/bus-api-osm
+Restart=on-failure
+RestartSec=5s
+
+# 하드닝
+
+# 1. 권한 상승 방지
+# 서비스 및 자식 프로세스가 setuid, setgid, 파일 capability 등을 통해 새로운 권한을 획득하는 것을 원천적으로 차단합니다.
+NoNewPrivileges=yes
+
+# 2. 파일 시스템 격리 및 보호
+# 서비스 전용 /tmp, /var/tmp를 생성하여 다른 프로세스와의 임시 파일 공유를 막습니다. 서비스 중지 시 자동 삭제됩니다.
+PrivateTmp=yes
+# 물리적 장치(/dev/sda 등) 접근을 차단하고, 가상 장치만 있는 새로운 /dev를 마운트합니다.
+PrivateDevices=yes
+# PrivateDevices와 함께 사용, /dev/null, /dev/zero, /dev/random 등 표준 의사 장치만 허용합니다.
+DevicePolicy=closed
+# /usr, /boot, /etc를 포함한 전체 파일 시스템을 읽기 전용으로 마운트합니다. (API 파일 시스템 제외)
+ProtectSystem=strict
+# /home, /root 디렉터리를 읽기 전용으로 만듭니다. 바이너리가 /home에 있으므로 접근을 막는 'true' 대신 'read-only'를 사용합니다.
+ProtectHome=read-only
+# 커널 제어 그룹(/sys/fs/cgroup)을 읽기 전용으로 만들어 서비스가 cgroup 설정을 변경하지 못하게 합니다.
+ProtectControlGroups=yes
+
+# 3. 커널 및 시스템 콜 보호
+# 커널 모듈의 로딩/언로딩을 금지합니다.
+ProtectKernelModules=yes
+# /proc/sys, /sys 등을 통한 커널 변수 변경을 금지합니다.
+ProtectKernelTunables=yes
+# personality() 시스템 콜을 잠가 프로세스 실행 도메인 변경을 방지합니다.
+LockPersonality=yes
+# SUID/SGID 비트 설정을 금지합니다.
+RestrictSUIDSGID=yes
+
+# 4. 네트워크 및 네임스페이스 제한
+# 허용할 소켓 주소 패밀리를 제한합니다. 일반적인 API는 UNIX, IPv4, IPv6, NETLINK면 충분합니다.
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+# 서비스가 새로운 네임스페이스를 생성하는 것을 막습니다.
+RestrictNamespaces=yes
+
+# 5. 프로세스 실행 환경 제한
+# 실시간(Real-time) 스케줄링 사용을 금지하여 시스템 자원 독점을 통한 DoS 공격을 방지합니다.
+RestrictRealtime=yes
+# 쓰기(W)와 실행(X)이 동시에 가능한 메모리 매핑 생성을 금지하여 코드 주입 공격을 어렵게 만듭니다. (JIT 컴파일러 사용 시 문제 발생 가능)
+MemoryDenyWriteExecute=yes
+
+# --- 추가 보안 강화 설정 ---
+
+# Capability 제한: 서비스에 필요한 최소한의 capability만 남기고 모두 제거합니다.
+# 기본적으로 모든 capability를 제거합니다. 만약 80, 443번 등 1024 미만 포트를 사용해야 한다면 아래 주석을 해제하세요.
+# CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=
+
+# 시스템 콜 필터링: 커널 공격 표면을 최소화하기 위해 허용할 시스템 콜 목록을 지정합니다. (Whitelist 방식)
+# @system-service: 일반 서비스에 필요한 기본 시스템 콜
+# @network-io: 네트워크 통신에 필요한 시스템 콜
+# @process: 기본적인 프로세스 관리에 필요한 시스템 콜
+# @file-system: 파일 시스템 접근에 필요한 시스템 콜
+# @basic-io: 기본적인 입출력에 필요한 시스템 콜
+# 참고: 이 설정은 매우 강력하지만, 애플리케이션에 따라 필요한 시스템 콜이 달라 테스트가 필요합니다.
+SystemCallFilter=@system-service @network-io @process @file-system @basic-io
+
+# 명시적 경로 제어: ProtectSystem=strict로 대부분이 읽기 전용이므로, 쓰기가 필요한 경로는 명시적으로 허용해야 합니다.
+# 예를 들어, 로그 파일을 /var/log/bus-api-osm에 저장한다면 아래 주석을 해제하세요. (디렉터리는 미리 생성해야 함)
+# ReadWritePaths=/var/log/bus-api-osm
+
+[Install]
+WantedBy=multi-user.target
