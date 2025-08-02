@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 struct GGDBusStop {
     station_id: i32,
-    station_name: String,
-    center_id: String,
+    station_nm: String,        // 필드명도 DB 컬럼명과 일치시키는 것이 좋음
+    center_id: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
     center_yn: String,
     x: f64,
     y: f64,
     region_name: String,
     mobile_no: String,
-    district_cd: String,
+    district_cd: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
 }
 
 #[derive(Deserialize)]
@@ -25,7 +25,10 @@ pub async fn get_ggd_bus_stops(
     db: web::Data<Pool>,
     query: web::Query<BboxQuery>,
 ) -> impl Responder {
-    let client = db.get().await.unwrap();
+    let client = match db.get().await {
+        Ok(client) => client,
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
     let bbox: Vec<&str> = query.bbox.split(',').collect();
 
     if bbox.len() != 4 {
@@ -37,14 +40,17 @@ pub async fn get_ggd_bus_stops(
     let max_lng: f64 = bbox[2].parse().unwrap();
     let max_lat: f64 = bbox[3].parse().unwrap();
 
-    let stmt = client
+    // SQL 쿼리의 컬럼명을 실제 DB에 저장된 소문자 이름으로 변경
+    let stmt = match client
         .prepare(
-            "SELECT STATION_ID, STATION_NM, CENTER_ID, CENTER_YN, X, Y, REGION_NAME, MOBILE_NO, DISTRICT_CD 
+            "SELECT station_id, station_nm, center_id, center_yn, x, y, region_name, mobile_no, district_cd
              FROM ggd_bus_stops
-             WHERE X BETWEEN $1 AND $2 AND Y BETWEEN $3 AND $4",
+             WHERE x BETWEEN $1 AND $2 AND y BETWEEN $3 AND $4",
         )
-        .await
-        .unwrap();
+        .await {
+            Ok(stmt) => stmt,
+            Err(_) => return HttpResponse::InternalServerError().finish(),
+        };
 
     let bus_stops_result = client
         .query(&stmt, &[&min_lng, &max_lng, &min_lat, &max_lat])
@@ -55,16 +61,17 @@ pub async fn get_ggd_bus_stops(
             let mut bus_stops = Vec::<GGDBusStop>::new();
 
             for row in rows {
+                // row.get()의 컬럼명도 소문자로 변경
                 let bus_stop = GGDBusStop {
-                    station_id: row.get("STATION_ID"),
-                    station_name: row.get("STATION_NM"),
-                    center_id: row.get("CENTER_ID"),
-                    center_yn: row.get("CENTER_YN"),
-                    x: row.get("X"),
-                    y: row.get("Y"),
-                    region_name: row.get("REGION_NAME"),
-                    mobile_no: row.get("MOBILE_NO"),
-                    district_cd: row.get("DISTRICT_CD"),
+                    station_id: row.get("station_id"),
+                    station_nm: row.get("station_nm"),
+                    center_id: row.get("center_id"),
+                    center_yn: row.get("center_yn"),
+                    x: row.get("x"),
+                    y: row.get("y"),
+                    region_name: row.get("region_name"),
+                    mobile_no: row.get("mobile_no"),
+                    district_cd: row.get("district_cd"),
                 };
 
                 bus_stops.push(bus_stop);
@@ -72,6 +79,9 @@ pub async fn get_ggd_bus_stops(
 
             HttpResponse::Ok().json(bus_stops)
         }
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => {
+            eprintln!("Database query error: {}", e);
+            HttpResponse::InternalServerError().finish()
+        }
     }
 }

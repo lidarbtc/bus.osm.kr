@@ -10,7 +10,7 @@ struct BusStop {
     stop_number: String,
     latitude: f64,
     longitude: f64,
-    info_display: String,
+    info_display: Option<String>, // NULL 값을 받을 수 있도록 Option<String>으로 변경
 }
 
 #[derive(Deserialize)]
@@ -23,7 +23,10 @@ pub async fn get_seoul_bus_stops(
     db: web::Data<Pool>,
     query: web::Query<BboxQuery>,
 ) -> impl Responder {
-    let client = db.get().await.unwrap();
+    let client = match db.get().await {
+        Ok(client) => client,
+        Err(_) => return HttpResponse::InternalServerError().finish(),
+    };
     let bbox: Vec<&str> = query.bbox.split(',').collect();
 
     if bbox.len() != 4 {
@@ -35,13 +38,16 @@ pub async fn get_seoul_bus_stops(
     let max_lng: f64 = bbox[2].parse().unwrap();
     let max_lat: f64 = bbox[3].parse().unwrap();
 
-    let stmt = client
+    // SQL 쿼리의 컬럼명을 실제 DB에 저장된 소문자 이름으로 변경 (예: 정류장_ID -> 정류장_id)
+    let stmt = match client
         .prepare(
-            "SELECT 정류장_ID, 정류장_명칭, 정류장_유형, 정류장_번호, 위도, 경도, 버스도착정보안내기_설치_여부 FROM seoul_bus_stops 
+            "SELECT 정류장_id, 정류장_명칭, 정류장_유형, 정류장_번호, 위도, 경도, 버스도착정보안내기_설치_여부 FROM seoul_bus_stops
                   WHERE 경도 BETWEEN $1 AND $2 AND 위도 BETWEEN $3 AND $4",
         )
-        .await
-        .unwrap();
+        .await {
+            Ok(stmt) => stmt,
+            Err(_) => return HttpResponse::InternalServerError().finish(),
+        };
 
     let bus_stops_result = client
         .query(&stmt, &[&min_lng, &max_lng, &min_lat, &max_lat])
@@ -52,8 +58,9 @@ pub async fn get_seoul_bus_stops(
             let mut bus_stops = Vec::<BusStop>::new();
 
             for row in rows {
+                // row.get()의 컬럼명도 소문자로 변경
                 let bus_stop = BusStop {
-                    stop_id: row.get("정류장_ID"),
+                    stop_id: row.get("정류장_id"),
                     name: row.get("정류장_명칭"),
                     stop_type: row.get("정류장_유형"),
                     stop_number: row.get("정류장_번호"),
@@ -67,6 +74,9 @@ pub async fn get_seoul_bus_stops(
 
             HttpResponse::Ok().json(bus_stops)
         }
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => {
+            eprintln!("Database query error: {}", e);
+            HttpResponse::InternalServerError().finish()
+        }
     }
 }
