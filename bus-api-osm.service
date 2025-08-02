@@ -5,10 +5,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/home/ubuntu/bus-api-osm/bus-api-osm
-User=ubuntu
-Group=ubuntu
-WorkingDirectory=/home/ubuntu/bus-api-osm
+ExecStart=/usr/local/lib/bus-api-osm/bus-api-osm
+User=busapi
+Group=busapi
+WorkingDirectory=/usr/local/lib/bus-api-osm
 Restart=on-failure
 RestartSec=5s
 
