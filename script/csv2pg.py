@@ -7,9 +7,16 @@ def load_csv_to_postgresql(
 ):
     # CSV 파일을 DataFrame으로 읽기
     if table_name == "seoul_bus_stops":
-        df = pd.read_csv(csv_file, delimiter=delimiter)
+        seoul_dtypes = {"ARS_ID": str}
+        df = pd.read_csv(csv_file, delimiter=delimiter, dtype=seoul_dtypes)
     else:
-        df = pd.read_csv(csv_file, delimiter=delimiter, lineterminator=line_terminator)
+        ggd_dtypes = {"mobileNo": str}
+        df = pd.read_csv(
+            csv_file,
+            delimiter=delimiter,
+            lineterminator=line_terminator,
+            dtype=ggd_dtypes,
+        )
 
     # ggd_bus_stops 테이블에 대한 특별 처리
     if table_name == "ggd_bus_stops":
@@ -67,12 +74,12 @@ def load_csv_to_postgresql(
         # DataFrame을 PostgreSQL 테이블로 복사
         for i, row in df.iterrows():
             placeholders = ", ".join(["%s"] * len(row))
-
             columns = ", ".join([col.lower() for col in row.index])
-
             sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
 
-            data_tuple = tuple(row.where(pd.notna(row), None))
+            # .where(pd.notna(row), None)은 NaN, NaT 등을 None으로 바꿔줌
+            # 문자열로 읽었기 때문에 빈 문자열이 있을 수 있으므로, 이를 None으로 처리하는 로직 추가
+            data_tuple = tuple(row.replace("", None).where(pd.notna(row), None))
 
             cursor.execute(sql, data_tuple)
         conn.commit()
