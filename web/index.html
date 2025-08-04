@@ -70,6 +70,15 @@
             .ol-popup-closer:after {
                 content: "✖";
             }
+        .github-link {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+                z-index: 1000;
+            }
+            .github-link svg {
+                fill: #333;
+            }
         </style>
     </head>
 
@@ -79,6 +88,9 @@
             <a href="#" id="popup-closer" class="ol-popup-closer"></a>
             <div id="popup-content"></div>
         </div>
+        <a href="https://github.com/lidarbtc/bus.osm.kr" class="github-link" target="_blank" rel="noopener noreferrer">
+            <img src="github-mark.svg" alt="GitHub Logo" width="32" height="32">
+        </a>
         <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
         <script>
             // 지도 초기화
