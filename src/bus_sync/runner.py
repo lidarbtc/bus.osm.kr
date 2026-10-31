@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .control import ControlClient, ControlError
-from .report import REPORT_FILES
+from .report import UPLOAD_FILES
 from .rollback import (OsmApi, RollbackConflict, RollbackRefused, RollbackUnavailable, execute_revert,
                        plan_revert)
 
@@ -121,7 +121,7 @@ def scheduled(data_dir: Path, output_dir: Path, exceptions: Path, client: Contro
         summary = summarize(output_dir)
         report_status = summary.get("report_status")
         status = report_status if code == 0 and report_status in {"completed", "completed_with_warnings"} else "failed"
-        for name in REPORT_FILES:
+        for name in UPLOAD_FILES:
             path = output_dir / name
             if path.is_file():
                 try:

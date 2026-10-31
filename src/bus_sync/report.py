@@ -7,8 +7,10 @@ import html
 import json
 from pathlib import Path
 
-REPORT_FILES = ("comparison.json", "stops.csv", "routes.csv", "stops.geojson", "report.html",
+REPORT_FILES = ("comparison.json", "stops.csv", "routes.csv", "stops.geojson", "report.html", "report-data.json",
                 "summary.md", "status.json", "source-manifest.json", "osm-manifest.json")
+# The dashboard renders report-data.json itself, so the self-contained report.html stays local.
+UPLOAD_FILES = tuple(name for name in REPORT_FILES if name != "report.html")
 
 
 def dump(path: Path, value) -> None:
@@ -75,10 +77,11 @@ def write_report(output: Path, result: dict, boundaries: dict) -> None:
                 "scope_state": r.get("scope_state", "inside"),
                 "exception": (r.get("exception") or {}).get("id", ""),
                 "candidates": r["candidates"]} for r in result["stops"] + result["routes"]]
-    embedded = json.dumps({"rows": compact, "boundaries": boundaries, "warnings": result["warnings"]},
-                          ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
-    title = html.escape(f"OSM {result.get('osm_snapshot_at') or '기준일 미상'} · 생성 {result['generated_at']}")
-    page = HTML.replace("__TITLE__", title).replace("__DATA__", embedded)
+    title = f"OSM {result.get('osm_snapshot_at') or '기준일 미상'} · 생성 {result['generated_at']}"
+    data = json.dumps({"title": title, "rows": compact, "boundaries": boundaries, "warnings": result["warnings"]},
+                      ensure_ascii=False, separators=(",", ":"))
+    (output / "report-data.json").write_text(data, encoding="utf-8")
+    page = HTML.replace("__TITLE__", html.escape(title)).replace("__DATA__", data.replace("<", "\\u003c"))
     (output / "report.html").write_text(page, encoding="utf-8")
 
 

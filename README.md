@@ -1,6 +1,6 @@
 # 서울·경기 버스와 OSM 비교
 
-서울·경기 공개 파일과 한국 OSM 추출본을 비교하는 도구입니다. 개인 API 키 없이 실행합니다. 비교는 읽기 전용이며 **OSM 업로드는 아직 비활성화**되어 있습니다. 운영 대시보드: https://osm-korea-bus-sync.lidarbtc.workers.dev
+서울·경기 공개 파일과 한국 OSM 추출본을 비교하는 도구입니다. 개인 API 키 없이 실행합니다. 비교는 읽기 전용이며 **OSM 업로드는 아직 비활성화**되어 있습니다. 운영 대시보드: https://bus.osm.kr
 
 ## 실행
 
@@ -82,11 +82,15 @@ uv run --locked bus-sync compare --data-dir data --osm-file data/raw/south-korea
 
 | 구성 | 위치 | 역할 |
 |---|---|---|
-| 비교 실행기 | `oracle-kr-2` (`/srv/osm-korea-bus-sync`, 사용자 `osmbus`) | 매일 **04:17 KST** 수집·비교, 5분마다 롤백 요청 처리 |
-| 대시보드 | [osm-korea-bus-sync.lidarbtc.workers.dev](https://osm-korea-bus-sync.lidarbtc.workers.dev) (Cloudflare Workers, D1, R2) | 실행 결과·보고서, 비상 정지, 롤백 요청, 공개 감사 기록 |
-| CI/CD | GitHub Actions | 테스트 후 Worker 배포. 서버는 성공한 커밋을 스스로 가져와 설치 |
+| 비교 실행기 | `oracle-kr-2` (`/srv/osm-korea-bus-sync`, 사용자 `osmbus`) | 매일 **04:17 KST** 수집·비교, 15분마다 롤백 요청 처리 |
+| 대시보드 | [bus.osm.kr](https://bus.osm.kr) (Vercel 프로젝트 `bus-osm-kr`, `dashboard/`, 함수 리전 icn1, 비공개 Blob 저장소) | 실행 결과·보고서, 비상 정지, 롤백 요청, 공개 감사 기록 |
+| CI/CD | GitHub Actions, Vercel Git 연동 | Actions는 테스트, Vercel은 `dashboard/` 변경 시 배포. 서버는 테스트가 성공한 커밋을 스스로 가져와 설치 |
 
-실행기는 매번 대시보드의 정지 스위치를 먼저 읽습니다. **정지 상태이거나 대시보드에 닿지 못하면 비교를 실행하지 않습니다.** 롤백 요청은 정지 중에도 처리합니다. 보고서는 gzip으로 R2에 120일 보관하며 `/reports/latest/report.html`이 최신 완료 보고서입니다. 보고서에는 OSM·공공데이터 문자열이 들어 있어 대시보드와 분리된 sandbox로 제공합니다.
+실행기는 매번 대시보드의 정지 스위치를 먼저 읽습니다. **정지 상태이거나 대시보드에 닿지 못하면 비교를 실행하지 않습니다.** 롤백 요청은 정지 중에도 처리합니다.
+
+대시보드 상태(정지 스위치, 실행 기록, 봇 변경세트, 롤백 작업, 감사 기록)는 Blob의 JSON 파일 하나에 저장하고, ETag 조건부 쓰기로 동시 수정을 막습니다. 보고서 파일은 실행기가 gzip으로 압축해 대시보드가 발급한 30분짜리 서명 URL로 Blob에 직접 올립니다. Vercel 함수 응답은 4.5MB로 제한되므로, `/api/reports/<실행 ID|latest>/<파일>`은 10분짜리 서명 다운로드 주소로 넘겨 줍니다. `/report.html?run=latest`는 `report-data.json`을 받아 브라우저에서 풀고 `textContent`로만 표시합니다. 최근 20개 실행의 파일만 보관합니다(`RETAIN_RUN_FILES`).
+
+Hobby 플랜 Blob 한도(저장 1GB, 월 전송 10GB, 월 단순 작업 1만·고급 작업 2천 회)에 맞춰 실행기 heartbeat는 3시간에 한 번만 쓰고, 롤백 확인 주기는 15분으로 둡니다. 2026-10-31 첫 실행 기준으로 압축 보고서는 1회 약 25MB이므로, 20회를 보관하면 약 500MB를 씁니다.
 
 ### 비상 정지와 롤백 권한
 
@@ -95,9 +99,11 @@ OSM 계정으로 로그인합니다(OAuth 2.0, `read_prefs`만 요청하고 토�
 - 한국에서 올린 변경세트가 **10개 이상**: 닫힌 변경세트 중 실제 변경이 1건 이상이고, 변경 범위의 중심점이 대한민국 OSM 국가 경계(relation 307756, 영해 포함·단순화) 안인 것만 셉니다. 최근 500개까지 확인합니다.
 - 현재 활성 차단(block)이 없음
 
-재개는 `ADMIN_OSM_UIDS`(wrangler.jsonc)에 등록된 운영자만 할 수 있습니다. 모든 정지·재개·롤백은 계정 이름과 사유가 대시보드에 공개 기록됩니다. 세션은 12시간이며 요청마다 출처와 CSRF 토큰을 확인합니다.
+재개는 `ADMIN_OSM_UIDS`(Vercel 환경 변수, 쉼표로 구분한 OSM 사용자 번호)에 등록된 운영자만 할 수 있습니다. 운영자 여부는 요청마다 이 값으로 다시 판단하므로 목록에서 빼면 바로 권한이 사라집니다. 모든 정지·재개·롤백은 계정 이름과 사유가 대시보드에 공개 기록됩니다. 세션은 서명된 쿠키로 12시간 유지하며, 요청마다 출처와 CSRF 토큰을 확인합니다.
 
-롤백은 **이 시스템의 봇 계정이 만든 변경세트**(대시보드의 봇 변경세트 목록)만 대상으로 합니다. 요청하면 자동 작업이 즉시 정지되고, 서버가 5분 안에 처리합니다.
+OSM OAuth 2.0 앱은 Confidential, 권한 `read_prefs`, 리디렉션 URI `https://bus.osm.kr/api/auth/callback`으로 등록합니다.
+
+롤백은 **이 시스템의 봇 계정이 만든 변경세트**(대시보드의 봇 변경세트 목록)만 대상으로 합니다. 요청하면 자동 작업이 즉시 정지되고, 서버가 15분 안에 처리합니다.
 
 - 봇이 만든 객체는 삭제하고, 수정·삭제한 객체는 봇 이전 버전으로 복원합니다.
 - 그 뒤 다른 사람이 같은 객체를 고쳤거나 OSM이 충돌을 반환하면 **아무것도 올리지 않고** `수동 처리 필요`로 표시합니다.
@@ -107,13 +113,16 @@ OSM 계정으로 로그인합니다(OAuth 2.0, `read_prefs`만 요청하고 토�
 
 ### 배포
 
-`main`에 push하면 `.github/workflows/deploy.yml`이 Python·Worker 테스트, D1 마이그레이션, Worker 배포를 차례로 실행합니다. 서버는 Tailscale 안에 있어 GitHub에서 접속하지 않습니다. 대신 서버의 `osm-korea-bus-sync-deploy.timer`가 5분마다 이 workflow가 **성공한** 가장 최근 커밋을 확인하고, 그 커밋을 `releases/<sha>`에 설치한 뒤 `current`를 바꿉니다. 저장소가 공개라 서버에 GitHub 자격 증명이 없고, GitHub에도 서버 접속 키가 없습니다. 최근 3개 릴리스를 보관합니다.
+`main`에 push하면 `.github/workflows/deploy.yml`이 Python·대시보드 테스트를 실행합니다. 대시보드는 Vercel Git 연동이 `dashboard/`를 루트로 배포하며, 그 폴더에 변경이 없으면 빌드를 건너뜁니다. 서버는 Tailscale 안에 있어 GitHub에서 접속하지 않습니다. 대신 서버의 `osm-korea-bus-sync-deploy.timer`가 5분마다 이 workflow가 **성공한** 가장 최근 커밋을 확인하고, 그 커밋을 `releases/<sha>`에 설치한 뒤 `current`를 바꿉니다. 저장소가 공개라 서버에 GitHub 자격 증명이 없고, GitHub에도 서버 접속 키나 배포 토큰이 없습니다. 최근 3개 릴리스를 보관합니다.
 
 | 비밀값 | 위치 |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | GitHub Actions. 이 계정의 Workers 배포·D1·계정 설정 읽기만 허용, 2027-10-31 만료 |
-| `RUNNER_TOKEN` | Worker 비밀값, 서버 `/etc/osm-korea-bus-sync/runner.env`(root:osmbus 0640) |
-| `OSM_CLIENT_ID`, `OSM_CLIENT_SECRET` | Worker 비밀값 (`wrangler secret put`) |
+| `RUNNER_TOKEN` | Vercel 환경 변수, 서버 `/etc/osm-korea-bus-sync/runner.env`의 `BUS_SYNC_RUNNER_TOKEN`(root:osmbus 0640) |
+| `SESSION_SECRET` | Vercel 환경 변수. 로그인 쿠키 서명용, 바꾸면 모든 세션이 끝남 |
+| `OSM_CLIENT_ID`, `OSM_CLIENT_SECRET` | Vercel 환경 변수 |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob 저장소 `osm-korea-bus-sync` 연결 시 자동 추가 |
+
+그 밖의 Vercel 환경 변수는 `PUBLIC_ORIGIN=https://bus.osm.kr`, `ADMIN_OSM_UIDS`입니다. 대시보드 테스트는 `cd dashboard && npm ci && npm test`로 실행합니다.
 
 서버 최초 설정은 저장소를 서버에 복사한 뒤 `sudo deploy/server/setup.sh`를 실행하고 표준 입력으로 실행기 토큰을 넣습니다. 상태 확인:
 

@@ -1,9 +1,9 @@
 [Unit]
-Description=Check for rollback requests every 5 minutes
+Description=Check for rollback requests every 15 minutes
 
 [Timer]
 OnBootSec=2min
-OnUnitInactiveSec=5min
+OnUnitInactiveSec=15min
 
 [Install]
 WantedBy=timers.target

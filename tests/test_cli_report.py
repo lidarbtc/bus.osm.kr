@@ -74,6 +74,9 @@ def test_reports_escape_untrusted_names_and_spreadsheet_formulas(tmp_path):
     page = (tmp_path / "report.html").read_text()
     assert '</script><script>alert("x")</script>' not in page
     assert "\\u003c/script>" in page
+    data = json.loads((tmp_path / "report-data.json").read_text())
+    assert any(r["name"] == '</script><script>alert("x")</script>' for r in data["rows"])
+    assert data["title"].startswith("OSM ") and data["boundaries"]["features"]
     with (tmp_path / "stops.csv").open(encoding="utf-8-sig") as stream:
         rows = list(csv.DictReader(stream))
     assert next(r for r in rows if r["key"] == "seoul:stop:1")["name"].startswith("'=")

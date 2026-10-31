@@ -1,4 +1,4 @@
-"""Client for the dashboard Worker's runner API."""
+"""Client for the dashboard's runner API."""
 
 from __future__ import annotations
 
@@ -66,10 +66,24 @@ class ControlClient:
         self._request("POST", "/api/runner/changesets", json={"id": changeset_id, "run_id": run_id, "comment": comment})
 
     def upload(self, run_id: str, path: Path) -> None:
+        """Gzips a report file and sends it straight to Blob storage through a presigned URL."""
+        name = Path(path).name
+        base = f"/api/runner/runs/{quote(run_id)}"
         with tempfile.TemporaryFile() as compressed:
             with Path(path).open("rb") as source, gzip.GzipFile(fileobj=compressed, mode="wb", mtime=0) as target:
                 shutil.copyfileobj(source, target, 1024 * 1024)
             size = compressed.tell()
+            grant = self._request("POST", f"{base}/uploads", json={"name": name, "size": size})
+            url = grant.get("url", "")
+            if urlsplit(url).scheme != "https":
+                raise ControlError(f"upload of {name} returned no https URL")
             compressed.seek(0)
-            self._request("PUT", f"/api/runner/runs/{quote(run_id)}/files/{quote(Path(path).name)}", data=compressed,
-                          headers={"Content-Type": "application/octet-stream", "Content-Length": str(size)})
+            try:
+                # The presigned URL carries its own authorization; the runner token must not go to Blob storage.
+                response = self.session.put(url, data=compressed, timeout=(15, 600), headers={
+                    "Content-Type": grant.get("content_type", "application/gzip"), "Content-Length": str(size)})
+            except requests.RequestException as exc:
+                raise ControlError(f"upload of {name} failed: {type(exc).__name__}") from exc
+            if response.status_code >= 400:
+                raise ControlError(f"upload of {name} failed: {response.status_code} {response.text[:300]}")
+        self._request("POST", f"{base}/files", json={"name": name, "size": size})

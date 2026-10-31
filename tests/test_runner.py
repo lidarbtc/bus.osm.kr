@@ -1,6 +1,10 @@
 import json
 
-from bus_sync.control import ControlError
+import gzip
+
+import pytest
+
+from bus_sync.control import ControlClient, ControlError
 from bus_sync.rollback import RollbackUnavailable
 from bus_sync.runner import control_poll, scheduled
 
@@ -56,6 +60,7 @@ def test_completed_run_uploads_reports_and_summary(tmp_path):
         out.mkdir()
         (out / "status.json").write_text(json.dumps({"status": "completed_with_warnings"}))
         (out / "report.html").write_text("<html>")
+        (out / "report-data.json").write_text("{}")
         (out / "comparison.json").write_text(json.dumps({
             "counts": {"stops": {"osm:matched": 5, "osm:osm_unmatched": 2, "source:source_unmatched": 4}, "routes": {}},
             "osm_snapshot_at": "2026-10-30T20:00:00Z", "warnings": ["a", "b"],
@@ -67,7 +72,53 @@ def test_completed_run_uploads_reports_and_summary(tmp_path):
     summary = client.runs[-1]["summary"]
     assert summary["headline"]["OSM 정류소 대응 미확인"] == 2 and summary["warning_count"] == 2
     assert summary["osm_writes"] == "disabled" and summary["exceptions_review_due"] == 1
-    assert set(client.uploads) == {"status.json", "report.html", "comparison.json"}
+    # report.html stays local; the dashboard renders report-data.json instead.
+    assert set(client.uploads) == {"status.json", "report-data.json", "comparison.json"}
+
+
+class FakeResponse:
+    def __init__(self, status_code=200, body=None):
+        self.status_code, self.body, self.text = status_code, body or {}, ""
+
+    def json(self):
+        return self.body
+
+
+class FakeSession:
+    def __init__(self, put_status=200, grant_url="https://store.blob.test/runs/x.gz?sig=1"):
+        self.calls, self.put_status, self.grant_url = [], put_status, grant_url
+
+    def request(self, method, url, headers=None, timeout=None, **kwargs):
+        self.calls.append((method, url, headers, kwargs.get("json")))
+        if url.endswith("/uploads"):
+            return FakeResponse(body={"url": self.grant_url, "content_type": "application/gzip"})
+        return FakeResponse(body={"ok": True})
+
+    def put(self, url, data=None, headers=None, timeout=None):
+        self.calls.append(("PUT", url, headers, gzip.decompress(data.read())))
+        return FakeResponse(self.put_status)
+
+
+def test_upload_presigns_puts_gzip_without_runner_token_and_records(tmp_path):
+    path = tmp_path / "summary.md"
+    path.write_text("요약")
+    session = FakeSession()
+    ControlClient("https://bus.test", "secret", session=session).upload("20261031T041700Z", path)
+    (m1, u1, _, b1), (m2, u2, h2, body), (m3, u3, _, b3) = session.calls
+    size = b1["size"]
+    assert (m1, u1, b1) == ("POST", "https://bus.test/api/runner/runs/20261031T041700Z/uploads", {"name": "summary.md", "size": size})
+    assert (m2, u2, body) == ("PUT", session.grant_url, "요약".encode())
+    assert h2["Content-Type"] == "application/gzip" and "Authorization" not in h2 and h2["Content-Length"] == str(size)
+    assert (m3, u3, b3) == ("POST", "https://bus.test/api/runner/runs/20261031T041700Z/files", {"name": "summary.md", "size": size})
+
+
+@pytest.mark.parametrize("session", [FakeSession(put_status=403), FakeSession(grant_url="http://plain.test/x")])
+def test_failed_or_insecure_upload_is_not_recorded(tmp_path, session):
+    path = tmp_path / "summary.md"
+    path.write_text("요약")
+    with pytest.raises(ControlError):
+        ControlClient("https://bus.test", "secret", session=session).upload("20261031T041700Z", path)
+    assert not any(call[1].endswith("/files") for call in session.calls)
 
 
 def test_failed_comparison_is_reported_as_failed(tmp_path):

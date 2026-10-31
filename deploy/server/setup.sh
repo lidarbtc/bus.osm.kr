@@ -25,7 +25,7 @@ fi
 install -d -o root -g "$user" -m 0750 /etc/osm-korea-bus-sync
 if [[ -n "$token" ]]; then
   umask 027
-  printf 'BUS_SYNC_CONTROL_URL=https://osm-korea-bus-sync.lidarbtc.workers.dev\nBUS_SYNC_RUNNER_TOKEN=%s\n' "$token" > /etc/osm-korea-bus-sync/runner.env
+  printf 'BUS_SYNC_CONTROL_URL=https://bus.osm.kr\nBUS_SYNC_RUNNER_TOKEN=%s\n' "$token" > /etc/osm-korea-bus-sync/runner.env
   chown root:"$user" /etc/osm-korea-bus-sync/runner.env
   chmod 0640 /etc/osm-korea-bus-sync/runner.env
 fi
