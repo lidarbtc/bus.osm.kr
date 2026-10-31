@@ -72,6 +72,8 @@ function el(tag, props, ...children) {
 }
 const when = (value) => value ? new Date(value).toLocaleString("ko-KR", {timeZone: "Asia/Seoul"}) : "—";
 const label = (map, value) => map[value] || value;
+const shortSha = (value) => value ? String(value).slice(0, 7) : "—";
+const SOURCES = {seoul: "서울", gbis: "경기"};
 
 function table(headers, rows, empty) {
   if (!rows.length) return el("div", {class: "empty"}, empty);
@@ -121,7 +123,7 @@ function renderStatus() {
   const c = state.control;
   const box = document.getElementById("status");
   box.className = "banner" + (c.stopped ? " stopped" : "");
-  const seen = c.runner_seen_at ? "Oracle 실행기 마지막 확인: " + when(c.runner_seen_at) + (c.runner_version ? " (" + c.runner_version + ")" : "") : "Oracle 실행기가 아직 연결되지 않았습니다.";
+  const seen = c.runner_seen_at ? "Oracle 실행기 마지막 확인: " + when(c.runner_seen_at) + (c.runner_version ? " (" + shortSha(c.runner_version) + ")" : "") : "Oracle 실행기가 아직 연결되지 않았습니다.";
   box.replaceChildren(
     el("strong", {}, c.stopped ? "비상 정지됨 — 자동 작업을 실행하지 않습니다" : "자동 작업 동작 중"),
     el("div", {}, c.actor_name ? (c.stopped ? "정지: " : "최근 재개: ") + c.actor_name + " · " + when(c.updated_at) + (c.reason ? " · 사유: " + c.reason : "") : ""),
@@ -140,7 +142,8 @@ function summaryCell(run) {
   const parts = [];
   if (s.error) parts.push(el("div", {class: "error"}, s.error));
   if (s.osm_snapshot_at) parts.push(el("div", {}, "OSM 기준 " + when(s.osm_snapshot_at)));
-  if (s.source_dates) parts.push(el("div", {}, Object.entries(s.source_dates).map(([k, v]) => k + " " + v).join(" · ")));
+  if (s.source_dates) parts.push(el("div", {}, Object.entries(s.source_dates).map(([k, v]) => label(SOURCES, k) + " 원천 " + v).join(" · ")));
+  if (s.stop_reason) parts.push(el("div", {}, "정지 사유: " + s.stop_reason));
   if (s.headline) parts.push(el("div", {}, Object.entries(s.headline).map(([k, v]) => k + " " + Number(v).toLocaleString("ko-KR")).join(" · ")));
   if (typeof s.warning_count === "number") parts.push(el("div", {class: "note"}, "주의 사항 " + s.warning_count + "건"));
   return parts.length ? parts : "—";
@@ -151,7 +154,9 @@ function renderRuns() {
     const files = run.files || [];
     const links = el("div", {class: "links"}, ["report.html", "summary.md", "comparison.json", "stops.csv", "routes.csv"].filter((f) => files.includes(f))
       .map((f) => el("a", {href: "/reports/" + encodeURIComponent(run.id) + "/" + f, target: "_blank", rel: "noopener"}, f)));
-    return [when(run.started_at), el("span", {class: "badge"}, label(STATUS, run.status)), run.code_version || "—", summaryCell(run), links];
+    return [when(run.started_at), el("span", {class: "badge"}, label(STATUS, run.status)),
+      run.code_version ? el("a", {href: "https://github.com/lidarbtc/osm-korea-bus-sync/commit/" + encodeURIComponent(run.code_version), target: "_blank", rel: "noopener"}, shortSha(run.code_version)) : "—",
+      summaryCell(run), links];
   });
   document.getElementById("runs").replaceChildren(table(["시작", "상태", "코드", "요약", "보고서"], rows, "아직 실행 기록이 없습니다."));
 }
