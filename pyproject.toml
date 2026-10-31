@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "osm-korea-bus-sync"
+version = "0.1.0"
+description = "Read-only comparison of Seoul and Gyeonggi bus feeds with OpenStreetMap"
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12,<5",
+  "openpyxl>=3.1,<4",
+  "osmium>=4.0,<5",
+  "requests>=2.32,<3",
+  "shapely>=2.0,<3",
+]
+
+[project.scripts]
+bus-sync = "bus_sync.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bus_sync"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+

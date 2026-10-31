@@ -1,0 +1,116 @@
+{
+  "retrieved_at_utc": "2026-10-09T02:35:23.296935+00:00",
+  "files": [
+    {
+      "file": "seoul-stops-20260902.xlsx",
+      "bytes": 741052,
+      "sha256": "73eb0a5f4fd0f6128237b5e23fa361fd1c6d8a31a83bcee2884e6a48481852bb",
+      "snapshot_date": "2026-09-02",
+      "landing_url": "https://data.seoul.go.kr/dataList/OA-15067/A/1/datasetView.do",
+      "download_url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+      "download_method": "POST",
+      "download_form": {
+        "infId": "OA-15067",
+        "seq": "58",
+        "infSeq": "1"
+      },
+      "license_label": "공공누리 1유형 : 출처표시 (상업적 이용 및 변경 가능)"
+    },
+    {
+      "file": "seoul-routes-20260902.xlsx",
+      "bytes": 198783,
+      "sha256": "0a8caf559c2f575919cb4c016fb8114dc0fc9f810066a6315ab50bd1195f76b8",
+      "snapshot_date": "2026-09-02",
+      "landing_url": "https://data.seoul.go.kr/dataList/OA-15066/F/1/datasetView.do",
+      "download_url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+      "download_method": "POST",
+      "download_form": {
+        "infId": "OA-15066",
+        "seq": "73",
+        "infSeq": "1"
+      },
+      "license_label": "공공누리 1유형 : 출처표시 (상업적 이용 및 변경 가능)"
+    },
+    {
+      "file": "seoul-route-stations-20260902.xlsx",
+      "bytes": 3251120,
+      "sha256": "b54816e9b7e77bcf49dd7562b993db06a093daa666351f115ea4d1dd0dd8b1df",
+      "snapshot_date": "2026-09-02",
+      "landing_url": "https://data.seoul.go.kr/dataList/OA-1095/S/1/datasetView.do",
+      "download_url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+      "download_method": "POST",
+      "download_form": {
+        "infId": "OA-1095",
+        "seq": "58",
+        "infSeq": "2"
+      },
+      "license_label": "공공누리 1유형 : 출처표시 (상업적 이용 및 변경 가능)"
+    },
+    {
+      "file": "gg-station20261009V2.txt",
+      "bytes": 3123339,
+      "sha256": "19586226944e775befaf2318d2ad483734f846352c69fc5c16e6d46b3d5f2796",
+      "snapshot_date": "2026-10-09",
+      "landing_url": "https://www.data.go.kr/data/15080658/openapi.do",
+      "download_url": "http://openapi.gbis.go.kr/ws/download?station20261009V2.txt",
+      "download_method": "GET",
+      "encoding": "UTF-8",
+      "record_delimiter": "^",
+      "field_delimiter": "|",
+      "license_label": "이용허락범위 제한 없음"
+    },
+    {
+      "file": "gg-route20261009V2.txt",
+      "bytes": 786398,
+      "sha256": "3becc4050dc1b973572ce878da7dc13f4fe4511bbc8c999c69f8bb226d903808",
+      "snapshot_date": "2026-10-09",
+      "landing_url": "https://www.data.go.kr/data/15080658/openapi.do",
+      "download_url": "http://openapi.gbis.go.kr/ws/download?route20261009V2.txt",
+      "download_method": "GET",
+      "encoding": "UTF-8",
+      "record_delimiter": "^",
+      "field_delimiter": "|",
+      "license_label": "이용허락범위 제한 없음"
+    },
+    {
+      "file": "gg-routestation20261009V2.txt",
+      "bytes": 15702321,
+      "sha256": "062b72fe99a873a9ca6a9f600b6e721ec172a09639cd7cf2b18bf06a43477396",
+      "snapshot_date": "2026-10-09",
+      "landing_url": "https://www.data.go.kr/data/15080658/openapi.do",
+      "download_url": "http://openapi.gbis.go.kr/ws/download?routestation20261009V2.txt",
+      "download_method": "GET",
+      "encoding": "UTF-8",
+      "record_delimiter": "^",
+      "field_delimiter": "|",
+      "license_label": "이용허락범위 제한 없음"
+    },
+    {
+      "file": "gg-routeline20261009V2.txt",
+      "bytes": 103974937,
+      "sha256": "c326d2186f02d7c2c0800d26e33af6771593978c173178bb4b5b261c7d4f8a60",
+      "snapshot_date": "2026-10-09",
+      "landing_url": "https://www.data.go.kr/data/15080658/openapi.do",
+      "download_url": "http://openapi.gbis.go.kr/ws/download?routeline20261009V2.txt",
+      "download_method": "GET",
+      "encoding": "UTF-8",
+      "record_delimiter": "^",
+      "field_delimiter": "|",
+      "license_label": "이용허락범위 제한 없음"
+    }
+  ],
+  "gg_discovery": {
+    "public_test_page": "https://www.gbis.go.kr/gbis2014/publicService.action?cmd=tBaseInfo",
+    "test_request": "https://www.gbis.go.kr/gbis2014/openAPI.action?cmd=getBaseInfo&serviceKey=1234567890&format=json",
+    "test_value_is_published_in_page_js": true,
+    "production_api": "https://apis.data.go.kr/6410000/baseinfoservice/v2/getBaseInfoItemv2",
+    "production_serviceKey_required": true
+  },
+  "notes": [
+    "서울 route기본정보 822개는 업체별 행; 노선번호723개. ROUTE_ID 없음.",
+    "서울 route-stations 41688행, ROUTE_ID 718개. 서로 완전 일치 가정 금지.",
+    "서울 정류소 11236행 중 한강선착장8행 포함. 좌표값은 경위도이나 landing에는 WGS84 (EPSG-5179) 모순 표기.",
+    "경기 station46032행은 서울4110 인천2415와 기타 전국 지자체를 포함. route3156개는 adminName이 모두 경기도/도내시군.",
+    "경기 routeTypeCd50 64개는 명칭 똑버스 및 운수사 DRT로 관측되지만 기반정보 문서 코드표에 없음."
+  ]
+}

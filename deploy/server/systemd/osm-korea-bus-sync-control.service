@@ -1,0 +1,18 @@
+[Unit]
+Description=Process rollback requests from the dashboard
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=osmbus
+Group=osmbus
+EnvironmentFile=/etc/osm-korea-bus-sync/runner.env
+Environment=HOME=/srv/osm-korea-bus-sync
+ExecStart=/srv/osm-korea-bus-sync/current/deploy/server/run-job control-poll
+TimeoutStartSec=30min
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/osm-korea-bus-sync

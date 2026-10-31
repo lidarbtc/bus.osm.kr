@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Installs the newest main commit whose "Deploy" workflow succeeded on GitHub.
+# The repository is public, so no GitHub credential is stored on the server.
+set -euo pipefail
+repo=lidarbtc/osm-korea-bus-sync
+root=/srv/osm-korea-bus-sync
+export UV_CACHE_DIR="$root/.cache/uv" UV_PYTHON_INSTALL_DIR="$root/.local/python" PATH="$root/.local/bin:$PATH"
+exec 9>"$root/deploy.lock"
+flock -n 9 || exit 0
+
+api="https://api.github.com/repos/$repo/actions/workflows/deploy.yml/runs?branch=main&event=push&status=success&per_page=1"
+sha="$(curl -fsSL --max-time 30 -H 'Accept: application/vnd.github+json' "$api" \
+  | python3 -c 'import json,sys; runs=json.load(sys.stdin)["workflow_runs"]; print(runs[0]["head_sha"] if runs else "")')"
+[[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "no successful deploy run found" >&2; exit 0; }
+current="$(cat "$root/current/REVISION" 2>/dev/null || true)"
+[[ "$sha" == "$current" ]] && exit 0
+
+target="$root/releases/$sha"
+stage="$root/releases/.stage-$sha"
+rm -rf "$stage"
+mkdir -p "$stage"
+curl -fsSL --max-time 300 "https://codeload.github.com/$repo/tar.gz/$sha" | tar -xz -C "$stage" --strip-components=1
+echo "$sha" > "$stage/REVISION"
+(cd "$stage" && uv sync --locked --no-dev --python 3.12 --quiet && .venv/bin/bus-sync --help > /dev/null)
+rm -rf "$target"
+mv "$stage" "$target"
+ln -sfn "$target" "$root/current.new"
+mv -T "$root/current.new" "$root/current"
+echo "deployed $sha (previous: ${current:-none})"
+
+# Keep the three newest releases; running jobs keep their resolved directory.
+ls -1dt "$root"/releases/*/ | tail -n +4 | xargs -r rm -rf

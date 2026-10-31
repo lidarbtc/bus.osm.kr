@@ -1,0 +1,9 @@
+[Unit]
+Description=Check GitHub for a new verified release every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitInactiveSec=5min
+
+[Install]
+WantedBy=timers.target

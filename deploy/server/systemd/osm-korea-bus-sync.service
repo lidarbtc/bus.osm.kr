@@ -1,0 +1,24 @@
+[Unit]
+Description=Seoul/Gyeonggi bus vs OSM comparison (checks the dashboard stop switch first)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=osmbus
+Group=osmbus
+EnvironmentFile=/etc/osm-korea-bus-sync/runner.env
+Environment=HOME=/srv/osm-korea-bus-sync
+ExecStart=/srv/osm-korea-bus-sync/current/deploy/server/run-job scheduled
+TimeoutStartSec=3h
+Nice=10
+MemoryMax=8G
+CPUQuota=200%
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/osm-korea-bus-sync
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes

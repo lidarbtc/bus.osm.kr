@@ -1,0 +1,749 @@
+{
+  "checked_date_kst": "2026-10-09",
+  "scope": "Targeted existence audit, not a complete Seoul/Gyeonggi census. Public feed snapshots have different effective dates. OSM data obtained from small targeted bboxes.",
+  "attribution": {
+    "osm": "© OpenStreetMap contributors",
+    "osm_license": "https://www.openstreetmap.org/copyright",
+    "public_sources": "See source-manifest.json for original URLs, versions, licenses and SHA256."
+  },
+  "source_stats": {
+    "seoul_stops": 11236,
+    "seoul_land_bus_stops": 11228,
+    "seoul_stop_types": {
+      "한강선착장": 8,
+      "중앙차로": 405,
+      "일반차로": 6251,
+      "가로변시간": 256,
+      "가로변전일": 141,
+      "마을버스": 4175
+    },
+    "seoul_route_weekday_company_rows": 822,
+    "seoul_unique_route_numbers": 723,
+    "seoul_route_station_rows": 41688,
+    "seoul_route_station_unique_ids": 718,
+    "seoul_routes_missing_from_route_station_feed": [
+      "TOUR01",
+      "TOUR02",
+      "TOUR04",
+      "TOUR11",
+      "TOUR12"
+    ],
+    "gbis_stops_including_other_provinces": 46032,
+    "gbis_routes": 3156,
+    "gbis_route_station_rows": 198210,
+    "gbis_route_types": {
+      "13": 1358,
+      "11": 422,
+      "50": 64,
+      "14": 56,
+      "12": 14,
+      "23": 250,
+      "21": 4,
+      "43": 34,
+      "51": 28,
+      "53": 27,
+      "52": 1,
+      "30": 898
+    },
+    "gbis_mobile_no_00000": 2970,
+    "gbis_duplicated_nonzero_mobile_numbers": 4779,
+    "gbis_route_station_unknown_station_ids": 0
+  },
+  "osm_inputs": [
+    {
+      "file": "snu_bbox.osm",
+      "sha256": "55e974f6eefc5b78febd06d191ba94e5bed31c34303d81c7d675182276765d81",
+      "api": "https://api.openstreetmap.org/api/0.6/map",
+      "bounds": {
+        "minlat": "37.4450000",
+        "minlon": "126.9450000",
+        "maxlat": "37.4660000",
+        "maxlon": "126.9630000"
+      }
+    },
+    {
+      "file": "everland_bbox.osm",
+      "sha256": "4b47e874ec6a286cbb25c16d6cc51fb745757bef3c93cac701feafa0d91b5469",
+      "api": "https://api.openstreetmap.org/api/0.6/map",
+      "bounds": {
+        "minlat": "37.2840000",
+        "minlon": "127.1910000",
+        "maxlat": "37.3010000",
+        "maxlon": "127.2160000"
+      }
+    },
+    {
+      "file": "yonsei_bbox.osm",
+      "sha256": "e9194677d72b788093a27b65f2d99773497b197dd55d405d86a95d582bb7e771",
+      "api": "https://api.openstreetmap.org/api/0.6/map",
+      "bounds": {
+        "minlat": "37.5620000",
+        "minlon": "126.9310000",
+        "maxlat": "37.5750000",
+        "maxlon": "126.9430000"
+      }
+    }
+  ],
+  "objects": [
+    {
+      "type": "node",
+      "id": 357899927,
+      "version": 13,
+      "timestamp": "2026-07-25T04:31:22Z",
+      "url": "https://www.openstreetmap.org/node/357899927",
+      "tags": {
+        "bus": "yes",
+        "name": "행정관",
+        "name:en": "Administration Building",
+        "name:ja": "行政館",
+        "name:ko": "행정관",
+        "name:zh": "行政楼",
+        "operator": "SNU Shuttle",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.4610706,
+        "lon": 126.9505104
+      },
+      "coordinate_method": "node",
+      "nearest_source_stops": [
+        {
+          "distance_m": 63.3,
+          "source": "seoul-20260902",
+          "id": "120000678",
+          "ref": "21917",
+          "name": "행정관",
+          "lon": 126.95022,
+          "lat": 37.461591
+        },
+        {
+          "distance_m": 104.4,
+          "source": "seoul-20260902",
+          "id": "120000195",
+          "ref": "21297",
+          "name": "문화관입구",
+          "lon": 126.9494503629,
+          "lat": 37.4614868493
+        },
+        {
+          "distance_m": 172.5,
+          "source": "seoul-20260902",
+          "id": "120000169",
+          "ref": "21271",
+          "name": "자연대.행정관입구",
+          "lon": 126.9488328413,
+          "lat": 37.4602745925
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "node",
+      "id": 357900068,
+      "version": 13,
+      "timestamp": "2026-07-25T04:31:22Z",
+      "url": "https://www.openstreetmap.org/node/357900068",
+      "tags": {
+        "bus": "yes",
+        "name": "행정관",
+        "name:en": "Administration Building",
+        "name:ja": "行政館",
+        "name:ko": "행정관",
+        "name:zh": "行政楼",
+        "operator": "SNU Shuttle",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.4608063,
+        "lon": 126.9501595
+      },
+      "coordinate_method": "node",
+      "nearest_source_stops": [
+        {
+          "distance_m": 87.4,
+          "source": "seoul-20260902",
+          "id": "120000678",
+          "ref": "21917",
+          "name": "행정관",
+          "lon": 126.95022,
+          "lat": 37.461591
+        },
+        {
+          "distance_m": 98.2,
+          "source": "seoul-20260902",
+          "id": "120000195",
+          "ref": "21297",
+          "name": "문화관입구",
+          "lon": 126.9494503629,
+          "lat": 37.4614868493
+        },
+        {
+          "distance_m": 131.2,
+          "source": "seoul-20260902",
+          "id": "120000169",
+          "ref": "21271",
+          "name": "자연대.행정관입구",
+          "lon": 126.9488328413,
+          "lat": 37.4602745925
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "node",
+      "id": 13392140061,
+      "version": 1,
+      "timestamp": "2025-12-21T03:51:32Z",
+      "url": "https://www.openstreetmap.org/node/13392140061",
+      "tags": {
+        "name": "301동 공학관(10B)",
+        "operator": "서울대학교",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.450004,
+        "lon": 126.9518878
+      },
+      "coordinate_method": "node",
+      "nearest_source_stops": [
+        {
+          "distance_m": 135.4,
+          "source": "seoul-20260902",
+          "id": "120000173",
+          "ref": "21275",
+          "name": "제2공학관",
+          "lon": 126.9520772668,
+          "lat": 37.4487952024
+        },
+        {
+          "distance_m": 155.3,
+          "source": "seoul-20260902",
+          "id": "120000174",
+          "ref": "21276",
+          "name": "유회진학술정보관.제1공학관",
+          "lon": 126.952595,
+          "lat": 37.451283
+        },
+        {
+          "distance_m": 207.3,
+          "source": "seoul-20260902",
+          "id": "120900164",
+          "ref": "21904",
+          "name": "제2파워플랜트",
+          "lon": 126.949695,
+          "lat": 37.449338
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "node",
+      "id": 13392140066,
+      "version": 1,
+      "timestamp": "2025-12-21T03:51:32Z",
+      "url": "https://www.openstreetmap.org/node/13392140066",
+      "tags": {
+        "name": "302동 공학관(9B)",
+        "operator": "서울대학교",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.4487783,
+        "lon": 126.9519144
+      },
+      "coordinate_method": "node",
+      "nearest_source_stops": [
+        {
+          "distance_m": 14.5,
+          "source": "seoul-20260902",
+          "id": "120000173",
+          "ref": "21275",
+          "name": "제2공학관",
+          "lon": 126.9520772668,
+          "lat": 37.4487952024
+        },
+        {
+          "distance_m": 79.7,
+          "source": "seoul-20260902",
+          "id": "120000238",
+          "ref": "21340",
+          "name": "제2공학관",
+          "lon": 126.9521425546,
+          "lat": 37.4480848677
+        },
+        {
+          "distance_m": 205.6,
+          "source": "seoul-20260902",
+          "id": "120900164",
+          "ref": "21904",
+          "name": "제2파워플랜트",
+          "lon": 126.949695,
+          "lat": 37.449338
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "ambiguous_nearby_public_stop",
+      "evidence_url": "https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "node",
+      "id": 13392140067,
+      "version": 1,
+      "timestamp": "2025-12-21T03:51:32Z",
+      "url": "https://www.openstreetmap.org/node/13392140067",
+      "tags": {
+        "name": "정문(1A)",
+        "operator": "서울대학교",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.4658903,
+        "lon": 126.9485412
+      },
+      "coordinate_method": "node",
+      "nearest_source_stops": [
+        {
+          "distance_m": 21.9,
+          "source": "seoul-20260902",
+          "id": "120000167",
+          "ref": "21269",
+          "name": "서울대정문",
+          "lon": 126.9483888926,
+          "lat": 37.4657347092
+        },
+        {
+          "distance_m": 57.9,
+          "source": "seoul-20260902",
+          "id": "120000197",
+          "ref": "21299",
+          "name": "서울대정문",
+          "lon": 126.9486357857,
+          "lat": 37.4653754725
+        },
+        {
+          "distance_m": 108.0,
+          "source": "seoul-20260902",
+          "id": "120000028",
+          "ref": "21127",
+          "name": "서울대학교",
+          "lon": 126.9479522861,
+          "lat": 37.4667414611
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "ambiguous_nearby_public_stop",
+      "evidence_url": "https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "way",
+      "id": 614535232,
+      "version": 2,
+      "timestamp": "2026-08-18T12:35:50Z",
+      "url": "https://www.openstreetmap.org/way/614535232",
+      "tags": {
+        "bus": "yes",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.29496465,
+        "lon": 127.20503025
+      },
+      "coordinate_method": "mean_of_distinct_ring_vertices",
+      "nearest_source_stops": [
+        {
+          "distance_m": 232.4,
+          "source": "gbis-20261009",
+          "id": "228001986",
+          "ref": "47904",
+          "name": "에버랜드(승차홈)",
+          "lon": 127.2069833,
+          "lat": 37.2935667
+        },
+        {
+          "distance_m": 273.3,
+          "source": "gbis-20261009",
+          "id": "228003584",
+          "ref": "00000",
+          "name": "에버랜드(하차홈)",
+          "lon": 127.2076667,
+          "lat": 37.2936833
+        },
+        {
+          "distance_m": 1066.7,
+          "source": "gbis-20261009",
+          "id": "228000390",
+          "ref": "29459",
+          "name": "전대3리",
+          "lon": 127.2137833,
+          "lat": 37.2883667
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://grp.everland.com/everedu/information/howto.html",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "way",
+      "id": 614535233,
+      "version": 2,
+      "timestamp": "2026-08-18T12:35:50Z",
+      "url": "https://www.openstreetmap.org/way/614535233",
+      "tags": {
+        "bus": "yes",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.2947852,
+        "lon": 127.205219875
+      },
+      "coordinate_method": "mean_of_distinct_ring_vertices",
+      "nearest_source_stops": [
+        {
+          "distance_m": 206.6,
+          "source": "gbis-20261009",
+          "id": "228001986",
+          "ref": "47904",
+          "name": "에버랜드(승차홈)",
+          "lon": 127.2069833,
+          "lat": 37.2935667
+        },
+        {
+          "distance_m": 248.7,
+          "source": "gbis-20261009",
+          "id": "228003584",
+          "ref": "00000",
+          "name": "에버랜드(하차홈)",
+          "lon": 127.2076667,
+          "lat": 37.2936833
+        },
+        {
+          "distance_m": 1040.8,
+          "source": "gbis-20261009",
+          "id": "228000390",
+          "ref": "29459",
+          "name": "전대3리",
+          "lon": 127.2137833,
+          "lat": 37.2883667
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://grp.everland.com/everedu/information/howto.html",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "way",
+      "id": 614535234,
+      "version": 2,
+      "timestamp": "2026-08-18T12:35:50Z",
+      "url": "https://www.openstreetmap.org/way/614535234",
+      "tags": {
+        "bus": "yes",
+        "public_transport": "platform"
+      },
+      "coordinates": {
+        "lat": 37.294640325,
+        "lon": 127.20545065
+      },
+      "coordinate_method": "mean_of_distinct_ring_vertices",
+      "nearest_source_stops": [
+        {
+          "distance_m": 180.6,
+          "source": "gbis-20261009",
+          "id": "228001986",
+          "ref": "47904",
+          "name": "에버랜드(승차홈)",
+          "lon": 127.2069833,
+          "lat": 37.2935667
+        },
+        {
+          "distance_m": 223.1,
+          "source": "gbis-20261009",
+          "id": "228003584",
+          "ref": "00000",
+          "name": "에버랜드(하차홈)",
+          "lon": 127.2076667,
+          "lat": 37.2936833
+        },
+        {
+          "distance_m": 1014.9,
+          "source": "gbis-20261009",
+          "id": "228000390",
+          "ref": "29459",
+          "name": "전대3리",
+          "lon": 127.2137833,
+          "lat": 37.2883667
+        }
+      ],
+      "action": "preserve_pending_entity_review",
+      "classification": "valid_shuttle_stop_candidate",
+      "evidence_url": "https://grp.everland.com/everedu/information/howto.html",
+      "limitations": [
+        "Distance is a screening signal, not proof of separate physical boarding facilities.",
+        "Operator confirms shuttle service; exact current pole/bay assignment is not independently surveyed."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20399451,
+      "version": 4,
+      "timestamp": "2026-04-18T12:58:46Z",
+      "url": "https://www.openstreetmap.org/relation/20399451",
+      "tags": {
+        "colour": "#003876",
+        "from": "무악학사",
+        "interval": "irregular",
+        "name": "연세대 셔틀버스 무악A",
+        "opening_hours": "Mo-Fr 08:05,08:10,08:20,08:25,08:35,08:40,08:45,09:15,09:30,09:45,10:15,10:30,10:45,11:15,11:30,11:45,12:35,12:45,12:55,13:05-18:55/10,20:35,20:45,21:05,21:15,21:35,21:45,22:05,22:10,22:25,22:30,22:45,22:50,23:05,23:07,23:17,23:22,23:32,23:37",
+        "ref": "연대 무악A",
+        "route": "bus",
+        "to": "백양누리 교통광장",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/363/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20399452,
+      "version": 3,
+      "timestamp": "2026-04-18T12:58:46Z",
+      "url": "https://www.openstreetmap.org/relation/20399452",
+      "tags": {
+        "colour": "#003876",
+        "from": "백양누리 교통광장",
+        "interval": "irregular",
+        "name": "연세대 셔틀버스 무악B",
+        "opening_hours": "Mo-Fr 12:35,12:45,12:55,13:05-18:55/10,20:20,20:30,20:50,21:00,21:20,21:30,21:50,22:00,22:10,22:20,22:30,22:40,22:50,23:00,23:10,23:15,23:25,23:30,23:40,23:45",
+        "ref": "연대 무악B",
+        "route": "bus",
+        "to": "무악학사",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/363/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20416697,
+      "version": 4,
+      "timestamp": "2026-04-06T14:32:10Z",
+      "url": "https://www.openstreetmap.org/relation/20416697",
+      "tags": {
+        "colour": "#003876",
+        "from": "연세대 백양누리 교통광장",
+        "interval": "irregular",
+        "name": "연세대 경복궁 셔틀버스 A노선",
+        "opening_hours": "Mo-Fr 08:05,08:13,08:21,08:29,08:37,08:45,08:53,09:01,09:09,09:17,09:25,09:35,09:45,09:55,10:05,10:15,10:25,10:35,10:45; PH off",
+        "operator": "연세대학교",
+        "ref": "연대 경복궁A",
+        "route": "bus",
+        "to": "경복궁역 1번 출구",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/363/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20416719,
+      "version": 3,
+      "timestamp": "2026-04-28T05:15:36Z",
+      "url": "https://www.openstreetmap.org/relation/20416719",
+      "tags": {
+        "colour": "#003876",
+        "from": "경복궁역 1번 출구",
+        "interval": "irregular",
+        "name": "연세대 경복궁 셔틀버스 B노선",
+        "opening_hours": "Mo-Fr 08:15-08:16,08:23-08:24,08:31-08:32,08:39-08:40,08:47-08:48,08:55-08:56,09:03-09:04,09:11-09:12,09:19-09:20,09:27-09:28,09:35-09:36,09:45-09:46,09:55-09:56,10:05-10:06,10:15-10:16,10:25-10:26,10:35-10:36,10:45-10:46,10:55-10:56,11:05-11:06; PH off",
+        "operator": "연세대학교",
+        "ref": "연대 경복궁B",
+        "route": "bus",
+        "to": "연세대 백양누리 교통광장",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/363/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20597569,
+      "version": 4,
+      "timestamp": "2026-05-05T06:02:00Z",
+      "url": "https://www.openstreetmap.org/relation/20597569",
+      "tags": {
+        "colour": "#003876",
+        "duration": "01:30:00",
+        "from": "연세대 국제캠",
+        "interval": "irregular",
+        "name": "연세대 송도 셔틀버스A",
+        "note": "연세대학교 학생만 연세포털 사이트에서 미리 예약해서 탑승 가능",
+        "opening_hours": "Mo-Fr 07:00,07:20,07:40,08:10,08:30,09:30,10:30,11:30,12:30,13:30,14:30,15:10,16:10,16:30,16:50,17:00,17:40,18:10,18:30,19:00,19:40,20:00,20:30,20:50; Sa-Su,PH off",
+        "operator": "연세대학교",
+        "ref": "연대 송도A",
+        "route": "bus",
+        "to": "연세대 신촌캠 백양누리 교통광장",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/364/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    },
+    {
+      "type": "relation",
+      "id": 20597697,
+      "version": 2,
+      "timestamp": "2026-09-25T22:53:37Z",
+      "url": "https://www.openstreetmap.org/relation/20597697",
+      "tags": {
+        "colour": "#003876",
+        "duration": "01:30:00",
+        "from": "연세대 신촌캠 백양누리",
+        "interval": "irregular",
+        "name": "연세대 송도 셔틀버스B",
+        "opening_hours": "Mo-Fr 07:00,07:20,07:40,08:30,09:30,10:30,11:30,12:30,13:30,14:00,14:30,15:10,16:30,17:00,17:30,18:00,18:20,18:30,19:00,19:20,20:00,21:00,22:00,22:50; Sa-Su,PH off",
+        "operator": "연세대학교",
+        "ref": "연대 송도B",
+        "route": "bus",
+        "to": "연세대 국제캠",
+        "type": "route"
+      },
+      "source_comparison": {
+        "exact_ref_in_seoul": false,
+        "exact_ref_in_gbis": false,
+        "yonsei_operator_in_either_source": false
+      },
+      "classification": "valid_service_outside_selected_feeds",
+      "action": "preserve_manual_only",
+      "evidence_url": "https://www.yonsei.ac.kr/sc/364/subview.do",
+      "service_evidence_period": [
+        "2026-09-01",
+        "2026-12-21"
+      ],
+      "review_after": "2026-12-22",
+      "limitations": [
+        "Public-feed absence assessed using operator, route name/ref and termini context; exact-ref miss alone is not proof.",
+        "OSM member geometry and timetable correctness not validated; A/B labels may be OSM-specific.",
+        "Review date expiry never authorizes deletion."
+      ]
+    }
+  ],
+  "next_audit": [
+    "Obtain complete OSM extract for Seoul and Gyeonggi and preserve full cross-boundary routes.",
+    "Normalize modes, provider IDs and physical stop representations before producing region-wide OSM-only counts.",
+    "Check suspected missing entities against current APIs, operator notices, OSM history and field evidence."
+  ],
+  "no_external_writes": true
+}

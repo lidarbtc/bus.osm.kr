@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily bus comparison at 04:17 KST
+
+[Timer]
+OnCalendar=*-*-* 04:17:00 Asia/Seoul
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,17 @@
+[Unit]
+Description=Install the newest commit that passed the GitHub Deploy workflow
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=osmbus
+Group=osmbus
+Environment=HOME=/srv/osm-korea-bus-sync
+ExecStart=/srv/osm-korea-bus-sync/bin/pull-deploy
+TimeoutStartSec=20min
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/srv/osm-korea-bus-sync

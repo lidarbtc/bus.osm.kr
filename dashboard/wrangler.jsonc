@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "osm-korea-bus-sync",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-15",
+  "account_id": "35b3305bfd095935de7070f4d99d6929",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  // Removes expired sessions and reports older than REPORT_RETENTION_DAYS.
+  "triggers": { "crons": ["30 19 * * *"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "osm-korea-bus-sync",
+      "database_id": "e2d218aa-854c-48fd-bd4a-2953a84105fd",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "REPORTS", "bucket_name": "osm-korea-bus-sync-reports" }],
+  // Secrets set with `wrangler secret put`: OSM_CLIENT_ID, OSM_CLIENT_SECRET, RUNNER_TOKEN.
+  "vars": {
+    "OSM_WEB": "https://www.openstreetmap.org",
+    "OSM_API": "https://api.openstreetmap.org",
+    "MIN_KOREA_CHANGESETS": "10",
+    "ADMIN_OSM_UIDS": "",
+    "SESSION_HOURS": "12",
+    "REPORT_RETENTION_DAYS": "120"
+  }
+}

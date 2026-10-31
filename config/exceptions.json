@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "unmatched_osm_action": "preserve",
+    "expired_exception_action": "preserve_and_review"
+  },
+  "exceptions": [
+    {
+      "id": "yonsei-muak-shuttle",
+      "osm_objects": ["relation/20399451", "relation/20399452"],
+      "classification": "valid_outside_source_scope",
+      "action": "preserve",
+      "reason": "연세대학교의 2026년 2학기 무악 셔틀 운행 안내를 확인했다. 조사한 서울·GBIS 공공 노선 피드의 범위 밖 서비스이므로 보존한다. OSM의 A/B 구분, 시간표, relation 경로와 개별 정차 위치까지 검증한 것은 아니다.",
+      "evidence_urls": ["https://www.yonsei.ac.kr/sc/363/subview.do"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-12-22",
+      "reviewer": "research-2026-10-09",
+      "scope": "무악학사↔백양누리 교통광장 셔틀 서비스 보존; 검토일 경과 시 재검토하며 삭제하지 않음"
+    },
+    {
+      "id": "yonsei-gyeongbokgung-shuttle",
+      "osm_objects": ["relation/20416697", "relation/20416719"],
+      "classification": "valid_outside_source_scope",
+      "action": "preserve",
+      "reason": "연세대학교의 2026년 2학기 경복궁 셔틀 운행 안내를 확인했다. 조사한 서울·GBIS 공공 노선 피드의 범위 밖 서비스이므로 보존한다. OSM의 A/B 구분, 시간표, relation 경로와 개별 정차 위치까지 검증한 것은 아니다.",
+      "evidence_urls": ["https://www.yonsei.ac.kr/sc/363/subview.do"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-12-22",
+      "reviewer": "research-2026-10-09",
+      "scope": "백양누리 교통광장↔경복궁역 셔틀 서비스 보존; 검토일 경과 시 재검토하며 삭제하지 않음"
+    },
+    {
+      "id": "yonsei-songdo-shuttle",
+      "osm_objects": ["relation/20597569", "relation/20597697"],
+      "classification": "valid_outside_source_scope",
+      "action": "preserve",
+      "reason": "연세대학교의 2026년 2학기 신촌·국제캠퍼스 셔틀 운행 안내를 확인했다. 조사한 서울·GBIS 공공 노선 피드의 범위 밖 서비스이므로 보존한다. 인천까지 이어지는 노선을 서울·경기 경계에서 잘라 판정하지 않는다. OSM 시간표와 relation 전체 경로의 정확성을 보증하지 않는다.",
+      "evidence_urls": ["https://www.yonsei.ac.kr/sc/364/subview.do"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-12-22",
+      "reviewer": "research-2026-10-09",
+      "scope": "신촌↔송도 국제캠퍼스 셔틀 서비스 보존; 경계 밖 구간 및 이용 자격은 별도 검토"
+    },
+    {
+      "id": "snu-administration-shuttle-platforms",
+      "osm_objects": ["node/357899927", "node/357900068"],
+      "classification": "needs_review",
+      "action": "preserve",
+      "reason": "공식 서울대 셔틀 안내에 행정관이 포함된다. OSM의 SNU Shuttle 승강장은 조사 당시 가장 가까운 공공 정류소와 각각 약 63m·87m 차이였다. 별도 승차 지점의 현재 위치와 공공 정류소와의 관계는 현장 확인 전이므로 삭제·병합하지 않는다.",
+      "evidence_urls": ["https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-11-09",
+      "reviewer": "research-2026-10-09",
+      "scope": "행정관 셔틀 승강장 후보 2개 보존; 별도 물리 승강장 여부 미확정"
+    },
+    {
+      "id": "snu-engineering-301-shuttle-platform",
+      "osm_objects": ["node/13392140061"],
+      "classification": "needs_review",
+      "action": "preserve",
+      "reason": "공식 서울대 셔틀 안내에 301동 공학관이 포함되며, 조사 당시 가장 가까운 공공 정류소와 약 135m 떨어져 있었다. 별도 셔틀 정류장 후보로 보존하되 거리만으로 독립 시설 또는 공공 피드 누락을 확정하지 않는다.",
+      "evidence_urls": ["https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-11-09",
+      "reviewer": "research-2026-10-09",
+      "scope": "301동 공학관(10B) 셔틀 승강장 후보 보존; 정확한 현재 정차 위치 재검토"
+    },
+    {
+      "id": "snu-engineering-302-ambiguous-platform",
+      "osm_objects": ["node/13392140066"],
+      "classification": "needs_review",
+      "action": "preserve",
+      "reason": "302동 공학관(9B)은 조사 당시 공공 정류소 제2공학관과 약 15m 차이여서 같은 물리 승차 지점일 수 있다. 셔틀 안내는 존재하지만 다른 이름이나 운영사만으로 공공 피드 밖의 별도 정류장이라고 확정하지 않으며 자동 병합하지 않는다.",
+      "evidence_urls": ["https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-11-09",
+      "reviewer": "research-2026-10-09",
+      "scope": "302동 승강장 보존; 공공 정류소와 동일 시설인지 검토 필요"
+    },
+    {
+      "id": "snu-main-gate-ambiguous-platform",
+      "osm_objects": ["node/13392140067"],
+      "classification": "needs_review",
+      "action": "preserve",
+      "reason": "정문(1A)은 조사 당시 공공 정류소 서울대정문과 약 22m 차이여서 같은 물리 승차 지점일 수 있다. 공식 셔틀 안내만으로 독립 시설임을 확정하지 않으며 현재 위치와 공용 승차 여부를 검토할 때까지 보존한다.",
+      "evidence_urls": ["https://www.snu.ac.kr/about/gwanak/shuttles/shuttle_stops"],
+      "verified_at": "2026-10-09",
+      "review_after": "2026-11-09",
+      "reviewer": "research-2026-10-09",
+      "scope": "정문 승강장 보존; 공공 정류소와 동일 시설인지 검토 필요"
+    },
+    {
+      "id": "everland-platform-bay-review",
+      "osm_objects": [
+        "way/614535232", "way/614535233", "way/614535234",
+        "node/14103009456", "node/14103009457", "node/14103009458"
+      ],
+      "classification": "needs_review",
+      "action": "preserve",
+      "reason": "에버랜드 공식 안내에서 셔틀 서비스를 확인했고, 조사한 platform way 3개는 가장 가까운 GBIS 승차홈과 약 181~232m 차이였다. 인접 platform node 3개도 2026-10-10 OSM API에서 확인했다. 각 승차홈의 현재 용도와 node/way 대응은 현장 확인 전이다. 6개 OSM 객체를 정류장 6개로 세거나 공공 피드 미포함만으로 제거하지 않는다.",
+      "evidence_urls": [
+        "https://grp.everland.com/everedu/information/howto.html",
+        "https://www.openstreetmap.org/node/14103009456",
+        "https://www.openstreetmap.org/node/14103009457",
+        "https://www.openstreetmap.org/node/14103009458"
+      ],
+      "verified_at": "2026-10-10",
+      "review_after": "2026-11-09",
+      "reviewer": "research-2026-10-10",
+      "scope": "에버랜드 승강장 객체 보존; 셔틀 승차홈 용도 및 node/way 표현 관계 검토 필요"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="bus-sync-test">
+  <node id="1" version="1" lat="0" lon="0"/><node id="2" version="1" lat="0" lon="2"/>
+  <node id="3" version="1" lat="2" lon="2"/><node id="4" version="1" lat="2" lon="0"/>
+  <node id="5" version="1" lat="0" lon="4"/><node id="6" version="1" lat="2" lon="4"/>
+  <node id="101" version="3" lat="1" lon="1"><tag k="highway" v="bus_stop"/><tag k="name" v="Inside Seoul"/></node>
+  <node id="102" version="1" lat="1" lon="5"><tag k="public_transport" v="platform"/><tag k="bus" v="yes"/><tag k="name" v="Cross-border stop"/></node>
+  <node id="103" version="1" lat="1.5" lon="1"><tag k="public_transport" v="platform"/><tag k="operator" v="University"/></node>
+  <node id="104" version="1" lat="1.2" lon="1"><tag k="public_transport" v="platform"/><tag k="railway" v="platform"/><tag k="train" v="yes"/></node>
+  <node id="105" version="1" lat="1" lon="3"><tag k="public_transport" v="stop_position"/></node>
+  <node id="106" version="1" lat="1" lon="7"><tag k="highway" v="bus_stop"/></node>
+  <node id="107" version="1" lat="1" lon="1.1"/>
+  <node id="108" version="1" lat="1.1" lon="1.1"/>
+  <node id="109" version="1" lat="1" lon="6"><tag k="highway" v="bus_stop"/></node>
+  <node id="110" version="1" lat="1" lon="2"><tag k="highway" v="bus_stop"/><tag k="name" v="Exactly on border"/></node>
+  <node id="111" version="1" lat="0.3" lon="0.3"/><node id="112" version="1" lat="0.3" lon="0.4"/>
+  <node id="113" version="1" lat="0.4" lon="0.4"/><node id="114" version="1" lat="0.4" lon="0.3"/>
+  <node id="115" version="1" lat="0.5" lon="-1"/><node id="116" version="1" lat="0.5" lon="5"/>
+  <node id="117" version="1" lat="0.8" lon="3.8"/><node id="118" version="1" lat="0.8" lon="4.2"/>
+  <node id="119" version="1" lat="1.2" lon="4.2"/><node id="120" version="1" lat="1.2" lon="3.8"/>
+  <way id="10" version="1"><nd ref="1"/><nd ref="2"/><nd ref="3"/></way>
+  <way id="11" version="1"><nd ref="3"/><nd ref="4"/><nd ref="1"/></way>
+  <way id="12" version="1"><nd ref="2"/><nd ref="5"/><nd ref="6"/><nd ref="3"/><nd ref="2"/></way>
+  <way id="201" version="2"><nd ref="117"/><nd ref="118"/><nd ref="119"/><nd ref="120"/><nd ref="117"/><tag k="public_transport" v="platform"/><tag k="bus" v="yes"/></way>
+  <way id="202" version="1"><nd ref="111"/><nd ref="112"/><nd ref="113"/><nd ref="114"/><nd ref="111"/></way>
+  <way id="203" version="1"><nd ref="101"/><nd ref="102"/><tag k="highway" v="residential"/></way>
+  <way id="204" version="1"><nd ref="115"/><nd ref="116"/><tag k="highway" v="primary"/></way>
+  <relation id="300" version="2"><member type="way" ref="10" role="outer"/><member type="way" ref="11" role="outer"/><tag k="type" v="boundary"/><tag k="boundary" v="administrative"/><tag k="ISO3166-2" v="KR-11"/><tag k="name" v="Seoul"/></relation>
+  <relation id="301" version="2"><member type="way" ref="12" role="outer"/><tag k="type" v="boundary"/><tag k="boundary" v="administrative"/><tag k="ISO3166-2" v="KR-41"/><tag k="name" v="Gyeonggi"/></relation>
+  <relation id="400" version="2"><member type="way" ref="202" role="outer"/><tag k="type" v="multipolygon"/><tag k="public_transport" v="platform"/><tag k="bus" v="yes"/></relation>
+  <relation id="450" version="1"><member type="node" ref="101" role="platform"/><member type="node" ref="105" role="stop"/><member type="node" ref="108" role="platform"/><member type="node" ref="104" role="platform"/><tag k="type" v="public_transport"/><tag k="public_transport" v="stop_area"/></relation>
+  <relation id="500" version="7"><member type="node" ref="101" role="platform"/><member type="node" ref="107" role="stop_entry_only"/><member type="node" ref="102" role="platform_exit_only"/><member type="node" ref="101" role="platform"/><member type="way" ref="203" role=""/><tag k="type" v="route"/><tag k="route" v="bus"/><tag k="ref" v="cross-border"/></relation>
+  <relation id="501" version="1"><member type="node" ref="109" role="platform"/><tag k="type" v="route"/><tag k="route" v="bus"/></relation>
+  <relation id="502" version="1"><member type="relation" ref="500" role=""/><member type="relation" ref="501" role=""/><tag k="type" v="route_master"/><tag k="route_master" v="bus"/></relation>
+  <relation id="503" version="1"><member type="node" ref="106" role="platform"/><tag k="type" v="route"/><tag k="route" v="bus"/></relation>
+  <relation id="504" version="1"><member type="way" ref="204" role=""/><tag k="type" v="route"/><tag k="route" v="bus"/></relation>
+</osm>

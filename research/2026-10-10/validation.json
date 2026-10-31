@@ -1,0 +1,123 @@
+{
+  "checked_date": "2026-10-10",
+  "full_acquisition_status": "failed_gbis_tls",
+  "osm_snapshot_at": "2026-10-09T20:21:04Z",
+  "osm_scope": {
+    "iso3166_2": [
+      "KR-11",
+      "KR-41"
+    ],
+    "method": "osm_administrative_boundaries",
+    "boundary_relation_ids": [
+      "relation/2297418",
+      "relation/2306392"
+    ],
+    "boundary_complete": true,
+    "reference_complete": false,
+    "completeness": "boundary_and_selected_transit_references_checked",
+    "full_extract_provenance_required": true,
+    "unknown_geometry_count": 0,
+    "unknown_route_geometry_count": 1
+  },
+  "osm_stop_objects": 42849,
+  "osm_inside_stop_objects": 41639,
+  "osm_route_objects": 1728,
+  "osm_route_scope_counts": {
+    "inside": 1721,
+    "outside": 6,
+    "unknown": 1
+  },
+  "seoul_primary_stops": 11236,
+  "seoul_supplemental_stops": 1863,
+  "seoul_routes": 723,
+  "diagnostic_comparison_seconds": 1.24,
+  "diagnostic_scope": "Full OSM inventory plus Seoul feed only. No region-wide unmatched counts are published because GBIS is unavailable.",
+  "exception_status": [
+    {
+      "id": "yonsei-muak-shuttle",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "relation/20399451",
+        "relation/20399452"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "yonsei-gyeongbokgung-shuttle",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "relation/20416697",
+        "relation/20416719"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "yonsei-songdo-shuttle",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "relation/20597569",
+        "relation/20597697"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "snu-administration-shuttle-platforms",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "node/357899927",
+        "node/357900068"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "snu-engineering-301-shuttle-platform",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "node/13392140061"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "snu-engineering-302-ambiguous-platform",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "node/13392140066"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "snu-main-gate-ambiguous-platform",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "node/13392140067"
+      ],
+      "not_observed": []
+    },
+    {
+      "id": "everland-platform-bay-review",
+      "review_due": false,
+      "action": "preserve",
+      "observed": [
+        "node/14103009456",
+        "node/14103009457",
+        "node/14103009458",
+        "way/614535232",
+        "way/614535233",
+        "way/614535234"
+      ],
+      "not_observed": []
+    }
+  ],
+  "osm_warnings": [
+    "1 bus route relations have incomplete geometry; geographic scope may be unknown",
+    "relation/10736816: missing or incomplete relation member geometry",
+    "relation/7388846: cyclic relation members"
+  ]
+}

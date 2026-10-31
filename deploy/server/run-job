@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Runs one bus-sync server command from the release this script belongs to.
+set -euo pipefail
+release="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+root=/srv/osm-korea-bus-sync
+export BUS_SYNC_VERSION="$(cat "$release/REVISION" 2>/dev/null || echo unknown)"
+export UV_CACHE_DIR="$root/.cache/uv" UV_PYTHON_INSTALL_DIR="$root/.local/python"
+cd "$release"
+case "${1:-}" in
+  scheduled)
+    # Keep a few days of national extracts and parsed inventories; sources are re-downloaded every run.
+    find "$root/shared/data/raw" -maxdepth 1 -name 'south-korea-*.osm.pbf*' -mtime +3 -delete 2>/dev/null || true
+    find "$root/shared/data/osm" -maxdepth 1 -name '*.json' -mtime +3 -delete 2>/dev/null || true
+    find "$root/shared/data/sources/raw" "$root/shared/data/sources/normalized" -type f -mtime +14 -delete 2>/dev/null || true
+    exec .venv/bin/bus-sync scheduled --data-dir "$root/shared/data" --output-dir "$root/shared/reports" \
+      --exceptions "$release/config/exceptions.json"
+    ;;
+  control-poll) exec .venv/bin/bus-sync control-poll ;;
+  *) echo "usage: run-job scheduled|control-poll" >&2; exit 2 ;;
+esac
