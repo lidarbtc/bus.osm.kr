@@ -21,9 +21,15 @@ rm -rf "$stage"
 mkdir -p "$stage"
 curl -fsSL --max-time 300 "https://codeload.github.com/$repo/tar.gz/$sha" | tar -xz -C "$stage" --strip-components=1
 echo "$sha" > "$stage/REVISION"
-(cd "$stage" && uv sync --locked --no-dev --python 3.12 --quiet && .venv/bin/bus-sync --help > /dev/null)
 rm -rf "$target"
 mv "$stage" "$target"
+# Virtualenvs embed absolute paths, so build it in the final directory.
+# The release only becomes "current" after the smoke test passes.
+if ! (cd "$target" && uv sync --locked --no-dev --python 3.12 --quiet && .venv/bin/bus-sync --help > /dev/null); then
+  rm -rf "$target"
+  echo "release $sha failed to install" >&2
+  exit 1
+fi
 ln -sfn "$target" "$root/current.new"
 mv -T "$root/current.new" "$root/current"
 echo "deployed $sha (previous: ${current:-none})"
