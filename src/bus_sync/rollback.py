@@ -200,7 +200,7 @@ def execute_revert(api, plan: Plan, comment: str) -> int:
         raise RollbackRefused("되돌릴 변경이 없습니다.")
     changeset_id = api.create_changeset({
         "comment": comment[:255], "created_by": "osm-korea-bus-sync", "bot": "yes",
-        "source": "https://github.com/lidarbtc/osm-korea-bus-sync",
+        "source": "https://github.com/lidarbtc/bus.osm.kr",
     })
     try:
         api.upload(changeset_id, build_osmchange(plan, changeset_id))

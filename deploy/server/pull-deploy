@@ -2,7 +2,7 @@
 # Installs the newest main commit whose "Deploy" workflow succeeded on GitHub.
 # The repository is public, so no GitHub credential is stored on the server.
 set -euo pipefail
-repo=lidarbtc/osm-korea-bus-sync
+repo=lidarbtc/bus.osm.kr
 root=/srv/osm-korea-bus-sync
 export UV_CACHE_DIR="$root/.cache/uv" UV_PYTHON_INSTALL_DIR="$root/.local/python" PATH="$root/.local/bin:$PATH"
 exec 9>"$root/deploy.lock"

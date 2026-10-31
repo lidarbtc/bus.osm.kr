@@ -105,7 +105,7 @@ function renderRuns() {
       DOWNLOADS.filter((f) => files.includes(f)).map((f) => el("a", {href: "/api/reports/" + id + "/" + f}, f + ".gz")),
       run.files_expired ? el("span", {class: "muted"}, "보관 기간이 지나 파일 삭제됨") : null);
     return [when(run.started_at), el("span", {class: "badge"}, label(STATUS, run.status)),
-      run.code_version ? el("a", {href: "https://github.com/lidarbtc/osm-korea-bus-sync/commit/" + encodeURIComponent(run.code_version), target: "_blank", rel: "noopener"}, shortSha(run.code_version)) : "—",
+      run.code_version ? el("a", {href: "https://github.com/lidarbtc/bus.osm.kr/commit/" + encodeURIComponent(run.code_version), target: "_blank", rel: "noopener"}, shortSha(run.code_version)) : "—",
       summaryCell(run), links];
   });
   document.getElementById("runs").replaceChildren(table(["시작", "상태", "코드", "요약", "보고서"], rows, "아직 실행 기록이 없습니다."));
