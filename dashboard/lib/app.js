@@ -141,8 +141,9 @@ export function createApp({ env, store, fetcher = fetch, clock = () => Date.now(
       response_type: "code", client_id: env.OSM_CLIENT_ID, redirect_uri: `${url.origin}/api/auth/callback`, scope: "read_prefs",
       state: stateValue, code_challenge: sha256(verifier).toString("base64url"), code_challenge_method: "S256",
     }).toString();
-    const sealed = sign(env.SESSION_SECRET, { s: stateValue, v: verifier, x: clock() + 600_000 });
-    return new Response(null, { status: 302, headers: { Location: target.toString(), "Set-Cookie": cookie(STATE_COOKIE, sealed, 600) } });
+    // Allow time for OSM sign-in (including two-factor) before the login request expires.
+    const sealed = sign(env.SESSION_SECRET, { s: stateValue, v: verifier, x: clock() + 1_800_000 });
+    return new Response(null, { status: 302, headers: { Location: target.toString(), "Set-Cookie": cookie(STATE_COOKIE, sealed, 1800) } });
   }
 
   async function callback(request, url) {
