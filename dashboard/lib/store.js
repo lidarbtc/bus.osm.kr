@@ -25,7 +25,8 @@ export function blobStore() {
     async read() {
       const result = await get(STATE_PATH, { access: "private", useCache: false });
       if (!result || result.statusCode !== 200) return { state: null, etag: null };
-      return { state: JSON.parse(await new Response(result.stream).text()), etag: result.blob.etag };
+      // Compressed reads can carry a weak ETag (W/"…"), but ifMatch only accepts the strong form.
+      return { state: JSON.parse(await new Response(result.stream).text()), etag: result.blob.etag.replace(/^W\//, "") };
     },
     async write(state, etag) {
       try {
