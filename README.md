@@ -50,6 +50,8 @@ uv run --locked bus-sync run --data-dir data --output-dir reports --exceptions c
 
 **비상 정지·롤백**은 한국에서 변경세트를 10개 이상 올렸고 활성 차단이 없는 OSM 계정이면 누구나 요청할 수 있습니다. 재개는 `ADMIN_OSM_UIDS`에 등록된 운영자만 할 수 있습니다. 모든 조작은 계정 이름과 사유가 공개 기록됩니다. 롤백은 이 시스템의 봇이 만든 변경세트만 대상으로 하며, 그 뒤 다른 사람이 같은 객체를 고쳤다면 아무것도 올리지 않고 수동 처리로 넘깁니다.
 
+자동 편집은 전용 계정 [lidarbtc_import](https://www.openstreetmap.org/user/lidarbtc_import)로만 올립니다. 편집 범위와 안전장치는 [OSM 위키 문서 초안](docs/wiki/Automated_edits_lidarbtc_import.wiki)에 정리합니다.
+
 로그인에는 OSM OAuth 2.0 앱이 필요합니다. 등록 조건은 Confidential, 권한 `read_prefs`, 리디렉션 URI `https://bus.osm.kr/api/auth/callback`입니다.
 
 | Vercel 환경 변수 | 용도 |

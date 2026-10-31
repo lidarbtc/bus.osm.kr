@@ -1,0 +1,39 @@
+<!-- Draft for https://wiki.openstreetmap.org/wiki/Automated_edits/lidarbtc_import. Nothing is uploaded until the Korean community agrees on the edit scope below. -->
+'''Status:''' proposed, not yet editing
+
+'''Account:''' [https://www.openstreetmap.org/user/lidarbtc_import lidarbtc_import], operated by [https://www.openstreetmap.org/user/lidarbtc lidarbtc]
+
+'''Dashboard:''' https://bus.osm.kr · '''Source code:''' https://github.com/lidarbtc/bus.osm.kr
+
+== Summary ==
+Keep bus stops and bus routes in Seoul (KR-11) and Gyeonggi-do (KR-41) in step with the official public bus data, using a daily comparison and a separate, clearly identified account.
+
+The comparison has run read-only since October 2026. Its daily report lists, for every stop and route, whether the official record and the OSM object match, and the evidence for that decision.
+
+== Data sources ==
+* Seoul Open Data Plaza: bus stop locations (OA-15067), route information (OA-15066), stops per route (OA-1095). Licence: KOGL Type 1. '''Explicit permission from the data provider will be requested before any import.'''
+* Gyeonggi-do Bus Information System (GBIS) public bulk files. Licence terms to be confirmed with the provider.
+* OSM data: Geofabrik South Korea extract, refreshed daily.
+
+== Planned edits ==
+'''To be agreed with the Korean community before the first upload.''' Each type of change will be listed here with examples and enabled one at a time.
+
+The following rules apply to every edit type:
+* OSM objects with no official counterpart are never deleted. Known valid exceptions (university shuttles, private or tourist services, and similar) are kept in a reviewed exception list.
+* Only objects that the comparison matched with strong evidence (official ID or stop number, plus name and location) are changed. Uncertain matches stay in the report for human review.
+* Route geometry (the ways a route follows) and timetables are not edited.
+
+== Changesets ==
+* Tags: <code>mechanical=yes</code>, <code>source=*</code> naming the dataset and its date, <code>description=</code> linking to this page, and a Korean and English <code>comment</code>.
+* Changesets will be grouped by district (gu or si) and kept small enough to review.
+* Every changeset is listed on the dashboard.
+
+== Safeguards ==
+* '''Emergency stop:''' any mapper with at least 10 non-empty changesets in South Korea and no active block can stop all automated edits by signing in with their OSM account at https://bus.osm.kr. Only operators can resume.
+* '''Rollback:''' the same mappers can request a rollback of any changeset made by this account. A rollback also stops automation. If someone has edited an affected object since, nothing is uploaded and the case is handed to a human.
+* All stop, resume and rollback actions are recorded publicly on the dashboard with the account name and reason.
+* The account's write token is stored only on the server that runs the job.
+
+== Discussion ==
+* Korean community forum: (link to be added)
+* Contact: [https://www.openstreetmap.org/message/new/lidarbtc message lidarbtc]
