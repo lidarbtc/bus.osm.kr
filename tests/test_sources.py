@@ -255,3 +255,32 @@ def test_invalid_new_workbook_does_not_publish_a_partial_snapshot(monkeypatch, b
         sources.fetch_sources(data)
     assert manifest.read_bytes() == before
     assert sources.load_sources(data) == first
+
+
+def test_gbis_files_announced_but_still_empty_use_the_previous_complete_day(monkeypatch, bulk_files, tmp_path):
+    from bus_sync.http import EmptyDownload
+    calls = install_fake_fetch(monkeypatch, bulk_files)
+    filled = sources._fetch
+
+    def gbis_late(url, destination, **kwargs):
+        if "openapi.gbis.go.kr/ws/download" in url and "20261010" in url and "routestation" in url:
+            calls.append((url, "GET"))
+            raise EmptyDownload(f"Empty download from {url}")
+        return filled(url, destination, **kwargs)
+
+    monkeypatch.setattr(sources, "_fetch", gbis_late)
+    result = sources.fetch_sources(tmp_path / "cache")
+    gbis = [f for f in result["files"] if f["provider"] == "gbis"]
+    # All three GBIS files move to the same earlier day, so stops and routes stay consistent.
+    assert {f["snapshot_date"] for f in gbis} == {"2026-10-09"} and len(gbis) == 3
+    assert {f["announced_filename"] for f in gbis} == {"station20261010V2.txt", "route20261010V2.txt", "routestation20261010V2.txt"}
+    assert any("still empty" in w and "2026-10-09" in w for w in result["warnings"])
+
+    def never(url, destination, **kwargs):
+        if "openapi.gbis.go.kr/ws/download" in url:
+            raise EmptyDownload(f"Empty download from {url}")
+        return filled(url, destination, **kwargs)
+
+    monkeypatch.setattr(sources, "_fetch", never)
+    with pytest.raises(sources.SourceError, match="no complete file set"):
+        sources.fetch_sources(tmp_path / "cache")

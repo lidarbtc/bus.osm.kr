@@ -23,6 +23,10 @@ class FetchError(RuntimeError):
     pass
 
 
+class EmptyDownload(FetchError):
+    """The provider answered with an empty file, typically one it announced but has not filled yet."""
+
+
 def fetch(url: str, destination: Path, method: str = "GET", data=None,
           allowed_hosts=None) -> dict:
     """Atomically save a complete response, retaining an existing file on failure.
@@ -79,9 +83,10 @@ def fetch(url: str, destination: Path, method: str = "GET", data=None,
                 fh.flush()
                 os.fsync(fh.fileno())
             expected = response.headers.get("Content-Length")
-            if not size or (expected and not response.headers.get("Content-Encoding")
-                            and size != int(expected)):
-                raise FetchError(f"Incomplete download: {size} bytes (expected {expected})")
+            if not size:
+                raise EmptyDownload(f"Empty download from {original_url}")
+            if expected and not response.headers.get("Content-Encoding") and size != int(expected):
+                raise FetchError(f"Incomplete download from {original_url}: {size} bytes (expected {expected})")
             temporary.replace(destination)
             temporary = None
             return {"url": original_url, "resolved_url": url, "sha256": digest.hexdigest(),

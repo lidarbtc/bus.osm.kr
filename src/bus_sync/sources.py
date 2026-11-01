@@ -15,12 +15,14 @@ import re
 import tempfile
 import unicodedata
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit
 
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
+
+from .http import EmptyDownload
 
 
 SEOUL_PAGES = {
@@ -32,6 +34,9 @@ SEOUL_DOWNLOAD = "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?u
 GBIS_TEST_PAGE = "https://www.gbis.go.kr/gbis2014/publicService.action?cmd=tBaseInfo"
 GBIS_TEST_API = "https://www.gbis.go.kr/gbis2014/openAPI.action"
 GBIS_KINDS = {"stops": "station", "routes": "route", "route_stations": "routeStation"}
+# GBIS announces each day's files at midnight and fills them later. When an announced
+# file is still empty, the whole GBIS set is taken from the latest earlier day instead.
+GBIS_EARLIER_DAYS = 3
 HOSTS = {"data.seoul.go.kr", "datafile.seoul.go.kr", "www.gbis.go.kr", "gbis.go.kr", "openapi.gbis.go.kr"}
 
 
@@ -74,6 +79,17 @@ def _date(value: str) -> str:
         return datetime.strptime(value, "%Y%m%d").date().isoformat()
     except ValueError as exc:
         raise SourceError(f"Invalid upstream snapshot date: {value!r}") from exc
+
+
+def _earlier_gbis(item: dict, days: int) -> dict:
+    """The same GBIS file as announced, from an earlier day; GBIS keeps them under the same name pattern."""
+    if not days:
+        return item
+    day = datetime.strptime(item["snapshot_date"], "%Y-%m-%d").date() - timedelta(days=days)
+    filename = item["upstream_filename"].replace(item["snapshot_date"].replace("-", ""), day.strftime("%Y%m%d"), 1)
+    return {**item, "snapshot_date": day.isoformat(), "upstream_filename": filename,
+            "url": f"http://openapi.gbis.go.kr/ws/download?{filename}",
+            "announced_filename": item["upstream_filename"]}
 
 
 def _discover_seoul(html: str, kind: str) -> dict:
@@ -476,9 +492,10 @@ def fetch_sources(data_dir: Path, *, refresh: bool = True) -> dict:
         response = stage / "gbis-discovery.json"
         _fetch(discovery_url, response)
         items, shape = _discover_gbis(response.read_text(encoding="utf-8"))
-        discovered.extend(items)
         files = []
-        for item in discovered:
+        notes = []
+
+        def download(item):
             # A provider may correct bytes without changing its date or URL.
             # Refresh therefore validates all six files; offline reuse is explicit.
             downloaded = stage / f"{item['provider']}-{item['kind']}.raw"
@@ -492,11 +509,28 @@ def fetch_sources(data_dir: Path, *, refresh: bool = True) -> dict:
             destination = root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             os.replace(downloaded, destination)
-            entry = {**metadata, **item, "path": relative, "sha256": checksum, "bytes": size}
-            files.append(entry)
+            return {**metadata, **item, "path": relative, "sha256": checksum, "bytes": size}
+
+        for item in discovered:
+            files.append(download(item))
+        for days in range(GBIS_EARLIER_DAYS + 1):
+            chosen = [_earlier_gbis(item, days) for item in items]
+            try:
+                files.extend(download(item) for item in chosen)
+            except EmptyDownload:
+                files = [f for f in files if f["provider"] != "gbis"]
+                continue
+            if days:
+                notes.append(f"GBIS announced {items[0]['snapshot_date']} files that were still empty; "
+                             f"used the complete set of {chosen[0]['snapshot_date']} instead")
+            break
+        else:
+            raise SourceError(f"GBIS published no complete file set in the {GBIS_EARLIER_DAYS} days "
+                              f"before {items[0]['snapshot_date']}")
         # Parsing precedes publication. A bad new file never replaces the prior
         # manifest; any unreferenced content-addressed raw file is harmless.
         result = _normalize(root, files, observed, shape)
+        result["warnings"].extend(notes)
         normalized = _json_bytes(result)
         checksum = hashlib.sha256(normalized).hexdigest()
         relative = f"normalized/{checksum}.json"
