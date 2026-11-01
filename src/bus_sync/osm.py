@@ -16,6 +16,8 @@ from shapely.ops import polygonize_full, unary_union
 from shapely.prepared import prep
 
 REGIONS = ("KR-11", "KR-41")
+# Districts (gu, si, gun) carry the Ministry of the Interior code of their province.
+DISTRICT_PREFIXES = {"11": "KR-11", "41": "KR-41"}
 _TYPES = {"n": "node", "w": "way", "r": "relation"}
 _RAIL = ("train", "subway", "tram", "light_rail", "monorail", "ferry")
 
@@ -134,6 +136,11 @@ def read_osm(path: Path) -> dict:
         if len(found) != 1:
             raise ValueError(f"Expected exactly one complete administrative boundary for {code}; found {len(found)}")
         boundary_rows[code] = found[0]
+    district_rows = sorted(
+        (r for r in relations.values() if r["tags"].get("boundary") == "administrative"
+         and r["tags"].get("admin_level") == "6"
+         and str(r["tags"].get("ref:KR:mois:admin", ""))[:2] in DISTRICT_PREFIXES),
+        key=lambda r: r["key"])
 
     routes = {k: r for k, r in relations.items()
               if r["tags"].get("route") == "bus" or r["tags"].get("route_master") == "bus"}
@@ -141,7 +148,7 @@ def read_osm(path: Path) -> dict:
     platform_relations = {k: r for k, r in relations.items() if _candidate(r["tags"])
                           and r["tags"].get("public_transport") != "stop_area"}
     needed_relations = set(routes) | set(areas) | set(platform_relations) | {
-        r["key"] for r in boundary_rows.values()}
+        r["key"] for r in boundary_rows.values()} | {r["key"] for r in district_rows}
     # Keep recursive relation dependencies, including multipolygon platforms.
     todo = list(needed_relations)
     while todo:
@@ -259,6 +266,23 @@ def read_osm(path: Path) -> dict:
     region_index = prep(region)
     if boundary_geometries[0].intersection(boundary_geometries[1]).area > 1e-9:
         raise ValueError("KR-11 and KR-41 administrative boundary interiors overlap")
+
+    # Districts only group the output; an incomplete one is reported, never guessed.
+    district_features = []
+    for row in district_rows:
+        name = row["tags"].get("name", "")
+        try:
+            geom = _polygon(ring_lines(row["key"]), row["key"])
+        except ValueError as exc:
+            warnings.add(f"District boundary {row['key']} ({name}) is incomplete and was skipped: {exc}")
+            continue
+        parent = DISTRICT_PREFIXES[str(row["tags"]["ref:KR:mois:admin"])[:2]]
+        if not region_index.covers(geom.representative_point()):
+            warnings.add(f"District boundary {row['key']} ({name}) lies outside {parent} and was skipped")
+            continue
+        district_features.append({"type": "Feature", "id": row["key"], "properties": {
+            "osm_key": row["key"], "version": row["version"], "name": name, "parent": parent,
+            "code": str(row["tags"]["ref:KR:mois:admin"])}, "geometry": mapping(geom)})
 
     def geometry_for(k: str, visiting: frozenset[str] = frozenset()):
         if k in geometries:
@@ -442,7 +466,7 @@ def read_osm(path: Path) -> dict:
     unknown_count = sum(s["geometry"] is None for s in stops_out)
     if unknown_count:
         warnings.add(f"{unknown_count} stop objects have unknown geometry and cannot be assigned a geographic scope")
-    return {"schema_version": 1, "snapshot_at": snapshot_at,
+    return {"schema_version": 2, "snapshot_at": snapshot_at,
             "scope": {"iso3166_2": list(REGIONS), "method": "osm_administrative_boundaries",
                       "boundary_relation_ids": [r["key"] for r in boundary_rows.values()],
                       "boundary_complete": True, "reference_complete": not integrity_errors,
@@ -450,5 +474,6 @@ def read_osm(path: Path) -> dict:
                       "full_extract_provenance_required": True, "unknown_geometry_count": unknown_count,
                       "unknown_route_geometry_count": len(unknown_routes)},
             "boundaries": {"type": "FeatureCollection", "features": features},
+            "districts": {"type": "FeatureCollection", "features": district_features},
             "stops": stops_out, "routes": routes_out, "stop_areas": areas_out,
             "warnings": sorted(warnings)}

@@ -12,6 +12,7 @@ const DONE = new Set(["completed", "completed_with_warnings"]);
 export const REPORT_FILES = new Set([
   "report-data.json", "summary.md", "status.json", "comparison.json", "source-manifest.json",
   "osm-manifest.json", "stops.csv", "routes.csv", "stops.geojson",
+  "ref-plan.json", "ref-tasks.geojson", "ref-changes.osc",
 ]);
 const RUNNER = { uid: null, name: "oracle-runner" };
 

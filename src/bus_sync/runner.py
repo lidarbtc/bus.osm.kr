@@ -77,6 +77,10 @@ def summarize(output_dir: Path) -> dict:
                 "공식 정류소 대응 미확인": stops.get("source:source_unmatched", 0),
                 "공식 노선 대응 미확인": routes.get("source:route:source_unmatched", 0),
             },
+            ref_plan=result.get("ref_plan_summary") and {
+                "changes": result["ref_plan_summary"]["changes"],
+                "tasks": sum(result["ref_plan_summary"]["tasks"].values()),
+                "agreement": (result["ref_plan_summary"].get("self_check") or {}).get("agreement")},
             warning_count=len(result.get("warnings", [])),
             exceptions_review_due=sum(bool(e.get("review_due")) for e in result.get("exceptions", [])),
         )

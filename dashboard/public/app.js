@@ -4,7 +4,8 @@ const STATUS = {running: "실행 중", completed: "완료", completed_with_warni
 const ACTIONS = {emergency_stop: "비상 정지", resume: "재개", rollback_requested: "롤백 요청", rollback_completed: "롤백 완료",
   rollback_needs_manual: "롤백 수동 처리 필요", rollback_failed: "롤백 실패"};
 const SOURCES = {seoul: "서울", gbis: "경기"};
-const DOWNLOADS = ["summary.md", "comparison.json", "stops.csv", "routes.csv", "stops.geojson"];
+const DOWNLOADS = ["summary.md", "comparison.json", "stops.csv", "routes.csv", "stops.geojson",
+  "ref-plan.json", "ref-changes.osc", "ref-tasks.geojson"];
 let me = {user: null}, state = null;
 
 function el(tag, props, ...children) {
@@ -93,6 +94,11 @@ function summaryCell(run) {
   if (s.source_dates) parts.push(el("div", {}, Object.entries(s.source_dates).map(([k, v]) => label(SOURCES, k) + " 원천 " + v).join(" · ")));
   if (s.headline) parts.push(el("div", {}, Object.entries(s.headline).map(([k, v]) => k + " " + Number(v).toLocaleString("ko-KR")).join(" · ")));
   if (typeof s.warning_count === "number") parts.push(el("div", {class: "note"}, "주의 사항 " + s.warning_count + "건"));
+  if (s.ref_plan) {
+    const agreement = typeof s.ref_plan.agreement === "number" ? " · 기존 번호와 일치율 " + (s.ref_plan.agreement * 100).toFixed(2) + "%" : "";
+    parts.push(el("div", {}, "번호 추가 계획 " + Number(s.ref_plan.changes).toLocaleString("ko-KR") + "곳 · 매퍼 확인 작업 "
+      + Number(s.ref_plan.tasks).toLocaleString("ko-KR") + "곳" + agreement + " (업로드 전)"));
+  }
   return parts.length ? parts : "—";
 }
 

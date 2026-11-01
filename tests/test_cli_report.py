@@ -42,6 +42,11 @@ def test_offline_cli_reads_real_osm_and_emits_all_reports(monkeypatch, tmp_path)
     assert any(r["key"] == "relation/501" for r in result["routes"])
     assert set(cli.REPORT_FILES) == {p.name for p in output.iterdir()}
     assert len(json.loads((output / "stops.geojson").read_text())["features"]) > 0
+    # The stop-number plan is written with every run, but nothing is uploaded.
+    plan = json.loads((output / "ref-plan.json").read_text())
+    assert plan["osm_writes"] == "disabled" and plan["summary"] == result["ref_plan_summary"]
+    assert "정류소 번호 추가 계획" in (output / "summary.md").read_text()
+    assert (output / "ref-changes.osc").read_bytes().startswith(b"<?xml")
 
 
 def test_source_failure_removes_prior_success_reports(monkeypatch, tmp_path):

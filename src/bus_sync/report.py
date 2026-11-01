@@ -8,7 +8,8 @@ import json
 from pathlib import Path
 
 REPORT_FILES = ("comparison.json", "stops.csv", "routes.csv", "stops.geojson", "report.html", "report-data.json",
-                "summary.md", "status.json", "source-manifest.json", "osm-manifest.json")
+                "summary.md", "status.json", "source-manifest.json", "osm-manifest.json",
+                "ref-plan.json", "ref-tasks.geojson", "ref-changes.osc")
 # The dashboard renders report-data.json itself, so the self-contained report.html stays local.
 UPLOAD_FILES = tuple(name for name in REPORT_FILES if name != "report.html")
 
@@ -32,6 +33,14 @@ def _csv(path, rows):
                 if isinstance(value, str) and value.lstrip().startswith(("=", "+", "-", "@")):
                     result[key] = "'" + value
             writer.writerow(result)
+
+
+def write_ref_plan(output: Path, plan: dict, meta: dict) -> None:
+    """The stop-number plan: every change with its evidence, mapper tasks, and an osmChange for JOSM."""
+    from .refs import osm_change, tasks_geojson
+    dump(output / "ref-plan.json", {**meta, "summary": plan["summary"], "changes": plan["changes"], "tasks": plan["tasks"]})
+    dump(output / "ref-tasks.geojson", tasks_geojson(plan["tasks"]))
+    (output / "ref-changes.osc").write_bytes(osm_change(plan["changes"]))
 
 
 def write_report(output: Path, result: dict, boundaries: dict) -> None:
@@ -65,6 +74,19 @@ def write_report(output: Path, result: dict, boundaries: dict) -> None:
               "## 예외", "", "| 예외 | 발견 | 미발견 | 재검토 기한 도래 |", "|---|---:|---:|---|"]
     for e in result["exceptions"]:
         lines.append(f"| {e['id']} | {len(e['observed'])} | {len(e['not_observed'])} | {e['review_due']} |")
+    plan = result.get("ref_plan_summary")
+    if plan:
+        lines += ["", "## 정류소 번호 추가 계획 (업로드 전)", "",
+                  f"번호가 없는 OSM 정류소 {plan['changes']:,}곳에 공식 정류소 번호(ref)를 추가할 수 있습니다. "
+                  "근거와 osmChange 파일은 ref-plan.json, ref-changes.osc에 있습니다.", ""]
+        check = plan.get("self_check") or {}
+        if check.get("agreement") is not None:
+            lines += [f"자체 점검: 번호가 있는 OSM 정류소 {check['hidden']:,}곳의 번호를 가리고 다시 계획하니 "
+                      f"{check['assigned']:,}곳에 번호를 배정했고, 매퍼가 넣은 번호와 {check['agreement']:.2%} 일치했습니다 "
+                      f"(불일치 {check['disagree']:,}곳, 매퍼 번호가 그 자리 공식 데이터에 없는 곳 "
+                      f"{check['mapped_number_not_official_here']:,}곳).", ""]
+        lines += ["| 매퍼 확인 작업 | 개수 |", "|---|---:|"]
+        lines.extend(f"| {kind} | {count:,} |" for kind, count in sorted(plan["tasks"].items(), key=lambda x: -x[1]))
     lines += ["", "미발견 예외도 삭제되지 않습니다. 노선의 도로 형상·시간표는 검증하지 않았습니다.", "",
               "report.html에서 검색·필터, comparison.json에서 대응 근거, CSV/GeoJSON에서 전체 결과를 확인할 수 있습니다.", "",
               f"## 주의 사항 ({len(result['warnings'])})", ""]

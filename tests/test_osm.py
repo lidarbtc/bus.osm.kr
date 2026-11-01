@@ -214,3 +214,15 @@ def test_cycle_through_network_relation_is_reported_without_recursing_forever(tm
     assert route["geometry_complete"] is False
     assert result["scope"]["reference_complete"] is False
     assert any("cyclic" in warning for warning in result["warnings"])
+
+
+def test_districts_group_the_regions_and_incomplete_ones_are_reported():
+    result = read_osm(FIXTURE)
+    districts = {f["properties"]["name"]: f["properties"] for f in result["districts"]["features"]}
+    assert districts == {
+        "종로구": {"osm_key": "relation/310", "version": 1, "name": "종로구", "parent": "KR-11", "code": "1111000000"},
+        "수원시": {"osm_key": "relation/311", "version": 1, "name": "수원시", "parent": "KR-41", "code": "4111000000"},
+    }
+    # An open ring is reported instead of failing the whole inventory; other provinces are ignored.
+    assert any("relation/312" in w and "incomplete" in w for w in result["warnings"])
+    assert not any("relation/313" in w for w in result["warnings"])
