@@ -34,8 +34,9 @@ SEOUL_DOWNLOAD = "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?u
 GBIS_TEST_PAGE = "https://www.gbis.go.kr/gbis2014/publicService.action?cmd=tBaseInfo"
 GBIS_TEST_API = "https://www.gbis.go.kr/gbis2014/openAPI.action"
 GBIS_KINDS = {"stops": "station", "routes": "route", "route_stations": "routeStation"}
-# GBIS announces each day's files at midnight and fills them later. When an announced
-# file is still empty, the whole GBIS set is taken from the latest earlier day instead.
+# GBIS announces each day's files at midnight and fills them later, and now and then
+# lists new routes' stop sequences a day before the routes themselves. When a day's files
+# are still empty or disagree, the whole GBIS set is taken from the latest complete day.
 GBIS_EARLIER_DAYS = 3
 HOSTS = {"data.seoul.go.kr", "datafile.seoul.go.kr", "www.gbis.go.kr", "gbis.go.kr", "openapi.gbis.go.kr"}
 
@@ -212,6 +213,15 @@ def _gbis_rows(path: Path, required: set[str]) -> list[dict]:
     if not result:
         raise SourceError(f"{path.name}: empty data file")
     return result
+
+
+def _gbis_disagreement(paths: dict[str, Path]) -> str | None:
+    """Why one day's GBIS files cannot be used together, if they cannot."""
+    master = {row["routeId"] for row in _gbis_rows(paths["routes"], {"routeId"})}
+    missing = {row["routeId"] for row in _gbis_rows(paths["route_stations"], {"routeId"})} - master
+    if not missing:
+        return None
+    return f"{len(missing)} {'route' if len(missing) == 1 else 'routes'} in stop sequences missing from the route master"
 
 
 def _coordinates(lon: str, lat: str, label: str) -> tuple[float, float]:
@@ -513,20 +523,26 @@ def fetch_sources(data_dir: Path, *, refresh: bool = True) -> dict:
 
         for item in discovered:
             files.append(download(item))
+        skipped = []
         for days in range(GBIS_EARLIER_DAYS + 1):
             chosen = [_earlier_gbis(item, days) for item in items]
+            day = chosen[0]["snapshot_date"]
             try:
-                files.extend(download(item) for item in chosen)
+                gbis = [download(item) for item in chosen]
             except EmptyDownload:
-                files = [f for f in files if f["provider"] != "gbis"]
+                skipped.append(f"{day} files were still empty")
                 continue
-            if days:
-                notes.append(f"GBIS announced {items[0]['snapshot_date']} files that were still empty; "
-                             f"used the complete set of {chosen[0]['snapshot_date']} instead")
+            problem = _gbis_disagreement({f["kind"]: root / f["path"] for f in gbis})
+            if problem:
+                skipped.append(f"{day} files disagree ({problem})")
+                continue
+            files.extend(gbis)
+            if skipped:
+                notes.append(f"GBIS {'; '.join(skipped)}; used the complete set of {day} instead")
             break
         else:
             raise SourceError(f"GBIS published no complete file set in the {GBIS_EARLIER_DAYS} days "
-                              f"before {items[0]['snapshot_date']}")
+                              f"before {items[0]['snapshot_date']}: {'; '.join(skipped)}")
         # Parsing precedes publication. A bad new file never replaces the prior
         # manifest; any unreferenced content-addressed raw file is harmless.
         result = _normalize(root, files, observed, shape)

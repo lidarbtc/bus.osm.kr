@@ -284,3 +284,23 @@ def test_gbis_files_announced_but_still_empty_use_the_previous_complete_day(monk
     monkeypatch.setattr(sources, "_fetch", never)
     with pytest.raises(sources.SourceError, match="no complete file set"):
         sources.fetch_sources(tmp_path / "cache")
+
+
+def test_gbis_day_whose_files_disagree_uses_the_previous_complete_day(monkeypatch, bulk_files, tmp_path):
+    # On 2026-11-04 GBIS listed the stop sequences of five new routes a day before the routes.
+    install_fake_fetch(monkeypatch, bulk_files)
+    filled = sources._fetch
+
+    def sequences_ahead(url, destination, **kwargs):
+        metadata = filled(url, destination, **kwargs)
+        if "routestation20261010" in url:
+            content = destination.read_bytes() + b"22|1|200^"
+            destination.write_bytes(content)
+            metadata = {**metadata, "sha256": hashlib.sha256(content).hexdigest(), "bytes": len(content)}
+        return metadata
+
+    monkeypatch.setattr(sources, "_fetch", sequences_ahead)
+    result = sources.fetch_sources(tmp_path / "cache")
+    assert {f["snapshot_date"] for f in result["files"] if f["provider"] == "gbis"} == {"2026-10-09"}
+    assert any("2026-10-10 files disagree (1 route in stop sequences missing from the route master)" in w
+               and "complete set of 2026-10-09" in w for w in result["warnings"])
