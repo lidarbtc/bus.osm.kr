@@ -269,11 +269,5 @@ def compare(sources: dict, inventory: dict, exceptions: dict) -> dict:
             "cross_boundary_support_route_objects": sum(r.get("scope_state") == "outside" for r in route_rows),
             "unknown_scope_stop_objects": sum(r.get("scope_state") == "unknown" for r in stop_rows),
             "unknown_scope_route_objects": sum(r.get("scope_state") == "unknown" for r in route_rows),
-            "count_units": {"source": "provider records, not unique physical stops/services",
-                            "osm": "OSM objects; platforms, stop positions and route directions may be separate"},
-            "limitations": ["Unmatched is not proof of absence, closure or a needed addition.",
-                            "Spatial/name matches are review candidates, not verified identities.",
-                            "Route matching verifies metadata/ordered stop overlap, not road geometry or timetables.",
-                            "Public feeds may have different dates and include modes or regions outside this audit."],
             "warnings": list(sources.get("warnings", [])) + list(inventory.get("warnings", [])),
             "exceptions": exception_status, "stops": stop_rows, "routes": route_rows}

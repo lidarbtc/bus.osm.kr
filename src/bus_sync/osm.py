@@ -460,12 +460,12 @@ def read_osm(path: Path) -> dict:
             integrity_errors.add(f"{k}: {geometry_errors.get(k, 'missing geometry')}")
     warnings.update(integrity_errors)
     if snapshot_at is None:
-        warnings.add("OSM snapshot timestamp is absent from the file header; object edit times are not a snapshot timestamp")
+        warnings.add("OSM snapshot timestamp is absent from the file header")
     if unknown_routes:
-        warnings.add(f"{len(unknown_routes)} bus route relations have incomplete geometry; geographic scope may be unknown")
+        warnings.add(f"{len(unknown_routes)} bus route relations have incomplete geometry")
     unknown_count = sum(s["geometry"] is None for s in stops_out)
     if unknown_count:
-        warnings.add(f"{unknown_count} stop objects have unknown geometry and cannot be assigned a geographic scope")
+        warnings.add(f"{unknown_count} stop objects have unknown geometry")
     return {"schema_version": 2, "snapshot_at": snapshot_at,
             "scope": {"iso3166_2": list(REGIONS), "method": "osm_administrative_boundaries",
                       "boundary_relation_ids": [r["key"] for r in boundary_rows.values()],

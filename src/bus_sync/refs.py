@@ -67,6 +67,24 @@ TASK_INSTRUCTIONS = {
     "platform_is_not_a_node": "정류장이 선이나 관계로만 그려져 있어 자동으로 번호를 붙이지 않았습니다.",
 }
 
+# Short names of the same tasks for summaries.
+TASK_LABELS = {
+    "mapped_twice": "두 번 그려진 정류장",
+    "no_official_partner": "짝이 되는 공식 정류장 없음",
+    "unclear_pairing": "길 양쪽 구분 불가",
+    "side_of_road_disagrees": "좌표와 진행 방향 불일치",
+    "other_official_stop_as_close": "다른 공식 정류장도 가까움",
+    "same_stop_as_numbered_neighbour": "번호 있는 옆 정류장과 같은 곳",
+    "neighbour_number_not_in_official_data": "옆 정류장 번호가 공식 데이터에 없음",
+    "too_many_same_name_stops": "같은 이름 정류장이 많음",
+    "local_stop_number_unknown": "지역 번호가 공식 데이터에 없음",
+    "no_official_stop_with_this_name": "같은 이름의 공식 정류장 없음",
+    "similar_name_unclear": "비슷한 이름 후보 여러 곳",
+    "number_already_on_nearby_stop": "근처에 같은 번호 있음",
+    "number_would_be_used_twice": "공식 번호 중복",
+    "platform_is_not_a_node": "선이나 관계로 그려진 정류장",
+}
+
 NUMBER = re.compile(r"(?<!\d)(\d{2})-?(\d{3})(?!\d)")
 
 

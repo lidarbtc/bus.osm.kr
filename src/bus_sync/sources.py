@@ -1,7 +1,5 @@
 """Acquire and normalize the public Seoul and GBIS bulk files.
 
-The GBIS discovery request is the request published by its public test page;
-it needs no personal key, but is still a website API, not a guaranteed bulk URL.
 Only a successful, fully parsed acquisition replaces the local manifest.
 """
 from __future__ import annotations
@@ -151,7 +149,7 @@ def _discover_gbis(body: str) -> tuple[list[dict], dict]:
                            "upstream_filename": filename, "url": url, "method": "GET", "data": None,
                            "license": "Unrestricted use (data.go.kr dataset 15080658)"})
         shape = {"url": item.get("routeLineDownloadUrl"), "version": item.get("routeLineVersion"),
-                 "downloaded": False, "reason": "Route geometry is not used by this read-only comparison."}
+                 "downloaded": False, "reason": "Route geometry is not compared."}
         return result, shape
     except (KeyError, TypeError, json.JSONDecodeError, ValueError) as exc:
         if isinstance(exc, SourceError):
@@ -365,7 +363,7 @@ def _parse_seoul(paths: dict[str, Path], aligned: bool, warnings: list[str]) -> 
         warnings.append(f"seoul:route:{ident}: master-only route; no ROUTE_ID or stop sequence available")
     duplicates = [name for name, count in Counter(r["name"] for r in routes).items() if count > 1]
     if duplicates:
-        warnings.append(f"Seoul: {len(duplicates)} route names map to multiple route IDs; do not merge by name")
+        warnings.append(f"Seoul: {len(duplicates)} route names map to multiple route IDs")
     return stops, routes
 
 
@@ -401,7 +399,7 @@ def _parse_gbis(paths: dict[str, Path], aligned: bool, warnings: list[str]) -> t
                        "stop_ids": ids, "sequence_complete": complete and aligned})
     duplicates = [name for name, count in Counter(r["name"] for r in routes).items() if count > 1]
     if duplicates:
-        warnings.append(f"GBIS: {len(duplicates)} route names map to multiple route IDs; do not merge by name")
+        warnings.append(f"GBIS: {len(duplicates)} route names map to multiple route IDs")
     return stops, routes
 
 
@@ -428,7 +426,7 @@ def _normalize(root: Path, files: list[dict], observed: str, shape: dict) -> dic
         duplicate_refs = sum(count > 1 for count in Counter(stop["ref"] for stop in stops if stop["ref"]).values())
         blank_refs = sum(not stop["ref"] for stop in stops)
         if duplicate_refs:
-            result["warnings"].append(f"{provider}: {duplicate_refs} duplicated public stop numbers; use provider + station ID")
+            result["warnings"].append(f"{provider}: {duplicate_refs} duplicated public stop numbers")
         if blank_refs:
             result["warnings"].append(f"{provider}: {blank_refs} blank/zero public stop numbers retained without a ref")
         unknown = sum(item["mode"] == "unknown" for item in [*stops, *routes])
@@ -437,7 +435,6 @@ def _normalize(root: Path, files: list[dict], observed: str, shape: dict) -> dic
             result["snapshots"][provider]["comparison_complete"] = False
     result["snapshots"]["gbis"]["route_geometry"] = shape
     result["snapshots"]["gbis"]["discovery"] = "public_test_api_no_personal_key"
-    result["warnings"].append("GBIS latest-file discovery uses its public website test API; availability is not a documented production guarantee")
     result["stops"].sort(key=lambda item: item["key"])
     result["routes"].sort(key=lambda item: item["key"])
     return result

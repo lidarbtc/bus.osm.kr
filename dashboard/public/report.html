@@ -3,46 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>서울·경기 버스 비교 보고서</title>
-<meta name="description" content="서울·경기 버스 정류소와 노선이 공공데이터와 OpenStreetMap에서 어떻게 대응하는지 검색하고 지도로 확인하는 보고서입니다.">
-<meta name="theme-color" content="#1a5f8a">
+<title>비교 보고서 · 서울·경기 버스 OSM 동기화</title>
+<meta name="description" content="서울·경기 버스 정류소와 노선의 공공데이터·OpenStreetMap 대응 현황">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141c22" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="bus.osm.kr">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:title" content="서울·경기 버스 비교 보고서">
-<meta property="og:description" content="서울·경기 버스 정류소와 노선이 공공데이터와 OpenStreetMap에서 어떻게 대응하는지 검색하고 지도로 확인하는 보고서입니다.">
+<meta property="og:title" content="비교 보고서 · 서울·경기 버스 OSM 동기화">
+<meta property="og:description" content="서울·경기 버스 정류소와 노선의 공공데이터·OpenStreetMap 대응 현황">
 <meta property="og:url" content="https://bus.osm.kr/report.html">
 <meta property="og:image" content="https://bus.osm.kr/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="서울·경기 버스 OSM 동기화 버스 아이콘과 bus.osm.kr">
+<meta property="og:image:alt" content="서울·경기 버스 OSM 동기화">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/app.css">
 <script src="/report.js" defer></script>
 </head>
 <body>
-<header><h1>서울·경기 버스 비교 보고서</h1><a href="/">대시보드</a></header>
-<main>
-  <p id="title" class="muted">보고서 데이터를 내려받는 중… (약 7MB)</p>
-  <p>공식 데이터와 OSM의 대응 근거를 확인하는 읽기 전용 보고서입니다. <b>미일치는 폐지나 삭제 판정이 아닙니다.</b>
-  정류소는 원천 레코드·OSM 객체 단위이며 노선의 도로 형상과 시간표는 검증하지 않았습니다.</p>
-  <p class="note">공공누리 제1유형 데이터의 OSM 반영 허락을 받기 전까지 이 보고서의 공식 이름·좌표를 OSM에 그대로 옮기지 마세요.</p>
-  <div class="controls">
-    <input id="search" type="search" placeholder="이름, 번호, 객체 ID 검색" aria-label="이름 번호 객체 ID 검색">
-    <select id="kind" aria-label="종류"><option value="">전체 종류</option><option value="stop">정류소</option><option value="route">노선</option><option value="route_master">노선 그룹</option></select>
-    <select id="side" aria-label="원천"><option value="">전체 원천</option><option value="seoul">서울 공식</option><option value="gbis">경기 공식</option><option value="osm">OSM</option></select>
-    <select id="status" aria-label="비교 상태"><option value="">전체 상태</option></select>
-    <label><input type="checkbox" id="support"> 경계 밖 정류소·노선 포함</label>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"><span>서울·경기 버스<span class="brand-long"> OSM 동기화</span></span></a>
   </div>
-  <p class="note">파랑: 공식 데이터 · 주황: OSM · 초록: 보존 예외</p>
-  <canvas id="map" aria-label="서울 경기 행정경계 및 정류소 분포"></canvas>
-  <div class="nav"><strong id="count"></strong><button id="prev" type="button">이전</button><span id="page"></span><button id="next" type="button">다음</button></div>
-  <div class="table"><table><thead><tr><th>이름 / 번호</th><th>원천 · 종류</th><th>객체</th><th>상태 / 예외</th><th>대응 근거</th></tr></thead><tbody id="body"></tbody></table></div>
-  <details><summary id="warnings-title">데이터 주의 사항</summary><pre id="warnings"></pre></details>
+</header>
+<main class="wrap">
+  <div class="page-head">
+    <h1>비교 보고서</h1>
+    <p id="meta" class="meta" aria-live="polite">불러오는 중…</p>
+  </div>
+  <div class="card toolbar" role="search">
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+      <input id="search" class="input" type="search" placeholder="이름, 번호, OSM ID" aria-label="검색" autocomplete="off" disabled>
+    </label>
+    <select id="kind" class="select" aria-label="종류" disabled>
+      <option value="">모든 종류</option><option value="stop">정류소</option><option value="route">노선</option><option value="route_master">노선 그룹</option>
+    </select>
+    <select id="side" class="select" aria-label="출처" disabled>
+      <option value="">모든 출처</option><option value="source">공식 (서울·경기)</option><option value="seoul">서울</option><option value="gbis">경기</option><option value="osm">OSM</option>
+    </select>
+    <select id="status" class="select" aria-label="상태" disabled><option value="">모든 상태</option></select>
+    <label class="check"><input id="support" type="checkbox" disabled> 경계 밖 포함</label>
+  </div>
+  <div class="card map-card">
+    <canvas id="map" role="img" aria-label="정류소 위치"></canvas>
+    <div class="legend"><span><i class="official"></i>공식</span><span><i class="osm"></i>OSM</span><span><i class="exception"></i>예외</span></div>
+  </div>
+  <div class="results-head">
+    <p id="count" class="count"></p>
+    <div class="pager" data-pager></div>
+  </div>
+  <div class="card table-card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>이름</th><th>구분</th><th>객체</th><th>상태</th><th>대응</th></tr></thead>
+        <tbody id="body"></tbody>
+      </table>
+    </div>
+    <p id="no-results" class="empty" hidden>조건에 맞는 항목이 없습니다.</p>
+  </div>
+  <div class="pager pager-bottom" data-pager></div>
 </main>
-<footer>지도 데이터 © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> (ODbL) · 서울 공공누리 1유형 · 경기도 버스정보</footer>
+<footer class="wrap footer">
+  <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
+  <a href="https://data.seoul.go.kr">서울특별시</a>
+  <a href="https://www.gbis.go.kr">경기도</a>
+  <a href="https://github.com/lidarbtc/bus.osm.kr">GitHub</a>
+</footer>
 </body>
 </html>

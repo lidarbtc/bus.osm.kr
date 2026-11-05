@@ -171,8 +171,6 @@ def test_platform_and_stop_position_are_two_osm_objects_not_two_physical_stops()
     assert result["counts"]["stops"]["osm:matched"] == 2
     assert result["counts"]["stops"]["source:matched"] == 1
     assert len(row(result, public["key"])["candidates"]) == 2
-    assert "OSM objects" in result["count_units"]["osm"]
-    assert "not unique physical" in result["count_units"]["source"]
     assert row(result, "node/1")["representation"] == "platform"
     assert row(result, "node/2")["representation"] == "stop_position"
 
@@ -299,7 +297,6 @@ def test_ordered_stop_overlap_is_metadata_evidence_never_geometry_verification()
     assert candidate["geometry_verified"] is False
     assert osm["geometry_verified"] is False
     assert row(result, public["key"], "routes")["geometry_verified"] is False
-    assert any("not road geometry or timetables" in limitation for limitation in result["limitations"])
 
 
 def test_same_stops_in_reverse_order_do_not_verify_the_direction():

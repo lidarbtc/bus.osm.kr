@@ -205,6 +205,7 @@ def test_every_task_kind_tells_mappers_what_to_do():
     from bus_sync import refs
     kinds_in_code = set(regex.findall(r'task\("([a-z_]+)"', inspect.getsource(refs)))
     assert kinds_in_code and kinds_in_code <= set(refs.TASK_INSTRUCTIONS)
+    assert set(refs.TASK_LABELS) == set(refs.TASK_INSTRUCTIONS)
     two = [official("seoul", "a", 0, 0, "마을회관", "30001"), official("seoul", "b", 20, 0, "마을회관", "30002")]
     feature = refs.tasks_geojson(plan_refs(sources(two), inventory(osm("node/1", 6, 0, "마을회관")))["tasks"])["features"][0]
     assert feature["properties"]["kind"] == "unclear_pairing" and feature["properties"]["osm"] == "node/1"

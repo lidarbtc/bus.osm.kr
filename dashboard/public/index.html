@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>서울·경기 버스 OSM 동기화</title>
-<meta name="description" content="서울·경기 버스 공공데이터와 OpenStreetMap을 매일 비교하고, 자동 편집의 비상 정지와 롤백을 공개적으로 관리하는 대시보드입니다.">
-<meta name="theme-color" content="#1a5f8a">
+<meta name="description" content="서울·경기 버스 공공데이터와 OpenStreetMap 비교, 자동 편집의 비상 정지와 롤백">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141c22" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -13,43 +15,54 @@
 <meta property="og:site_name" content="bus.osm.kr">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:title" content="서울·경기 버스 OSM 동기화">
-<meta property="og:description" content="서울·경기 버스 공공데이터와 OpenStreetMap을 매일 비교하고, 자동 편집의 비상 정지와 롤백을 공개적으로 관리하는 대시보드입니다.">
+<meta property="og:description" content="서울·경기 버스 공공데이터와 OpenStreetMap 비교, 자동 편집의 비상 정지와 롤백">
 <meta property="og:url" content="https://bus.osm.kr/">
 <meta property="og:image" content="https://bus.osm.kr/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="서울·경기 버스 OSM 동기화 버스 아이콘과 bus.osm.kr">
+<meta property="og:image:alt" content="서울·경기 버스 OSM 동기화">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/app.css">
 <script src="/app.js" defer></script>
 </head>
 <body>
-<header>
-  <h1>서울·경기 버스 OSM 동기화</h1>
-  <div id="account" aria-live="polite"></div>
+<header class="topbar">
+  <div class="wrap">
+    <h1 class="brand-title"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"><span>서울·경기 버스<span class="brand-long"> OSM 동기화</span></span></a></h1>
+    <div id="account" class="account"></div>
+  </div>
 </header>
-<main>
-  <section id="status" class="banner" aria-live="polite">상태를 불러오는 중…</section>
-  <section id="actions"></section>
-  <section>
-    <h2>비교 실행</h2>
-    <p class="note">보고서는 브라우저에서 바로 보고, 원본 결과는 gzip 압축 파일로 내려받습니다.</p>
+<main class="wrap">
+  <section id="status" class="card status is-loading" aria-live="polite">불러오는 중…</section>
+  <section class="section" aria-labelledby="latest-title">
+    <div class="section-head">
+      <h2 id="latest-title">최근 비교</h2>
+      <p id="latest-meta" class="meta"></p>
+    </div>
+    <div id="latest"></div>
+  </section>
+  <section class="section" aria-labelledby="runs-title">
+    <h2 id="runs-title">실행 기록</h2>
     <div id="runs"></div>
   </section>
-  <section>
-    <h2>봇 변경세트</h2>
-    <p class="note">이 시스템의 봇 계정이 OSM에 올린 변경세트만 표시합니다. 롤백을 요청하면 자동 작업이 함께 정지됩니다.</p>
+  <section class="section" aria-labelledby="changesets-title">
+    <h2 id="changesets-title">봇 변경세트</h2>
     <div id="changesets"></div>
   </section>
-  <section>
-    <h2>롤백 요청</h2>
+  <section id="jobs-section" class="section" aria-labelledby="jobs-title" hidden>
+    <h2 id="jobs-title">롤백 요청</h2>
     <div id="jobs"></div>
   </section>
-  <section>
-    <h2>감사 기록</h2>
+  <section class="section" aria-labelledby="audit-title">
+    <h2 id="audit-title">감사 기록</h2>
     <div id="audit"></div>
   </section>
 </main>
-<footer>지도 데이터 © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> · 서울 공공누리 1유형 · 경기도 버스정보 · <a href="https://github.com/lidarbtc/bus.osm.kr">소스 코드</a></footer>
+<footer class="wrap footer">
+  <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>
+  <a href="https://data.seoul.go.kr">서울특별시</a>
+  <a href="https://www.gbis.go.kr">경기도</a>
+  <a href="https://github.com/lidarbtc/bus.osm.kr">GitHub</a>
+</footer>
 </body>
 </html>

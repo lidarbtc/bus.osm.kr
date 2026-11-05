@@ -1,4 +1,4 @@
-"""Public-data acquisition and read-only comparison commands."""
+"""Command line entry points."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ log = logging.getLogger("bus-sync")
 
 
 def _parser():
-    parser = argparse.ArgumentParser(description="서울·경기 버스와 OSM의 읽기 전용 전체 비교 (업로드 기능 없음)")
+    parser = argparse.ArgumentParser(description="서울·경기 버스와 OSM 비교")
     commands = parser.add_subparsers(dest="command", required=True)
     for command in ("run", "compare", "fetch", "fetch-osm", "scheduled"):
         sub = commands.add_parser(command)
@@ -33,10 +33,10 @@ def _parser():
             sub.add_argument("--output-dir", type=Path, default=Path("reports"))
             sub.add_argument("--exceptions", type=Path, default=Path("config/exceptions.json"))
     commands.add_parser("control-poll", help="대시보드에 쌓인 롤백 요청만 처리")
-    plan = commands.add_parser("rollback-plan", help="봇 변경세트 롤백 계획을 업로드 없이 출력")
+    plan = commands.add_parser("rollback-plan", help="봇 변경세트 롤백 계획 출력")
     plan.add_argument("--changeset", type=int, required=True)
     plan.add_argument("--bot-uid", type=int, required=True)
-    export = commands.add_parser("export-osc", help="정류소 번호 추가 계획을 구·시별 osmChange 파일로 저장 (업로드 없음)")
+    export = commands.add_parser("export-osc", help="정류소 번호 추가 계획을 구·시별 osmChange 파일로 저장")
     export.add_argument("--plan", type=Path, default=Path("reports/ref-plan.json"))
     export.add_argument("--district", action="append", default=[], help="구·시 이름. 여러 번 지정 가능")
     export.add_argument("--output", type=Path, required=True)
@@ -71,14 +71,12 @@ def _freshness(sources, inventory, today):
                 raise ValueError(f"{provider}/{kind}: snapshot date is in the future: {value}")
             limit = 62 if provider == "seoul" else 7
             if age > limit:
-                warnings.append(f"{provider}/{kind}: source is {age} days old; recheck publication status")
+                warnings.append(f"{provider}/{kind}: source is {age} days old")
     timestamp = inventory.get("snapshot_at")
     if timestamp:
         age = (today - datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date()).days
         if age > 7:
             warnings.append(f"OSM extract is {age} days old")
-    else:
-        warnings.append("OSM snapshot timestamp is unavailable; do not treat download time as the data date")
     return warnings
 
 
@@ -140,8 +138,6 @@ def main(argv=None):
                 manifest = recorded
         manifest["sha256"] = sha
         sources["warnings"].extend(_freshness(sources, inventory, today))
-        if manifest.get("coverage") != "national_extract":
-            sources["warnings"].append("Local OSM file: boundary/reference checks do not prove complete regional coverage")
         log.info("Comparing %s source stop records with %s OSM objects", len(sources["stops"]), len(inventory["stops"]))
         result = compare(sources, inventory, exceptions)
         log.info("Planning stop numbers for mapped stops without one")
